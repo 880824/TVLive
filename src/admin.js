@@ -547,7 +547,7 @@
 
    function initSortable(){Vue.nextTick(function(){
      if(liteSortGridRef.value)Sortable.create(liteSortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add)',ghostClass:'.ghost',onEnd:function(){var list=[];Array.prototype.forEach.call(liteSortGridRef.value.children,function(c){if(c.classList.contains('tag-add'))return;list.push(c.getAttribute('data-name'))});cfg.value.liteSortTypes=list;cfg.value={...cfg.value}}});
-     if(sortGridRef.value)Sortable.create(sortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add):not(.locked)',ghostClass:'.ghost',onEnd:function(){var names=[];Array.prototype.forEach.call(sortGridRef.value.children,function(c){if(c.classList.contains('tag-add')||c.classList.contains('locked'))return;names.push(c.getAttribute('data-group'))});cfg.value.sortOrder=names;cfg.value={...cfg.value}});
+     if(sortGridRef.value)Sortable.create(sortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add):not(.locked)',ghostClass:'.ghost',onEnd:function(){var names=[];Array.prototype.forEach.call(sortGridRef.value.children,function(c){if(c.classList.contains('tag-add')||c.classList.contains('locked'))return;names.push(c.getAttribute('data-group'))});cfg.value.sortOrder=names;cfg.value={...cfg.value}}});
      if(m3uTableRef.value)Sortable.create(m3uTableRef.value,{animation:150,handle:'tr',onEnd:function(ev){var list=cfg.value.m3uList||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value={...cfg.value}}});
    })}
 
