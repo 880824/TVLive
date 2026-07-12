@@ -368,13 +368,6 @@
          </div></div>
        </div>
        <div class="panel">
-         <div class="panel-header">频道名字符删除 <span class="badge badge-info">{{cfg.deleteChars.length}}</span></div>
-         <div class="panel-body"><div class="tag-grid">
-           <div v-for="(c,i) in cfg.deleteChars" :key="i" class="tag-item" style="cursor:default"><input class="tag-input" v-model="cfg.deleteChars[i]"><button class="del-btn" @click="cfg.deleteChars.splice(i,1)">&times;</button></div>
-           <div class="tag-item" style="cursor:default"><input class="tag-input" v-model="newDelChar" placeholder="新增字符" @keyup.enter="addDelChar"><button class="btn btn-outline btn-xs" @click="addDelChar">+</button></div>
-         </div></div>
-       </div>
-       <div class="panel">
          <div class="panel-header">频道名清理列表（REMOVAL_LIST） <span class="badge badge-info">{{cfg.removalList.length}}</span></div>
          <div class="panel-body"><div class="tag-grid">
            <div v-for="(r,i) in cfg.removalList" :key="i" class="tag-item" style="cursor:default"><input class="tag-input" v-model="cfg.removalList[i]"><button class="del-btn" @click="cfg.removalList.splice(i,1)">&times;</button></div>
@@ -487,7 +480,7 @@
    var origin=Vue.ref('');var saving=Vue.ref(false);var loadingStats=Vue.ref(false);
    var speedtestRunning=Vue.ref(false);var speedtestProgress=Vue.ref({completed:0,total:0,passed:0,failed:0,progress:0});
    var speedtestLastResult=Vue.ref(null);
-   var newDelGroup=Vue.ref('');var newBlockKey=Vue.ref('');var newDelChar=Vue.ref('');var newRemoval=Vue.ref('');
+   var newDelGroup=Vue.ref('');var newBlockKey=Vue.ref('');var newRemoval=Vue.ref('');
    var newUrlFrom=Vue.ref('');var newUrlTo=Vue.ref('');var newWhiteUrl=Vue.ref('');var newBlackUrl=Vue.ref('');
    var showAddWhite=Vue.ref(false);var showAddBlack=Vue.ref(false);
    var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);
@@ -523,7 +516,7 @@
 
    function addDelGroup(){if(newDelGroup.value.trim()){cfg.value.deleteGroups.push(newDelGroup.value.trim());newDelGroup.value=''}}
    function addBlockKey(){if(newBlockKey.value.trim()){cfg.value.channelBlockKeywords.push(newBlockKey.value.trim());newBlockKey.value=''}}
-   function addDelChar(){if(newDelChar.value.trim()){cfg.value.deleteChars.push(newDelChar.value.trim());newDelChar.value=''}}
+   
    function addRemoval(){if(newRemoval.value.trim()){cfg.value.removalList.push(newRemoval.value.trim());newRemoval.value=''}}
    function addUrlRule(){if(newUrlFrom.value.trim()&&newUrlTo.value.trim()){cfg.value.urlReplaceRules[newUrlFrom.value.trim()]=newUrlTo.value.trim();cfg.value.urlReplaceRules={...cfg.value.urlReplaceRules};newUrlFrom.value='';newUrlTo.value=''}}
    function renameUrlRule(oldKey,newKey){if(newKey!==oldKey&&newKey){cfg.value.urlReplaceRules[newKey]=cfg.value.urlReplaceRules[oldKey];delete cfg.value.urlReplaceRules[oldKey];cfg.value.urlReplaceRules={...cfg.value.urlReplaceRules}}}
@@ -570,7 +563,7 @@
    // 加载初始数据
    origin.value=window.location.origin;
    Promise.all([
-     http(api.base+'/get').then(function(r){if(r&&typeof r==='object'){r.groupReplaceRules=r.groupReplaceRules||{};r.nameReplaceRules=r.nameReplaceRules||{};r.urlReplaceRules=r.urlReplaceRules||{};r.deleteGroups=r.deleteGroups||[];r.channelBlockKeywords=r.channelBlockKeywords||[];r.removalList=r.removalList||[];if(r.deleteChars){var dc=new Set(r.removalList);r.deleteChars.forEach(function(x){dc.add(x)});r.removalList=Array.from(dc);r.deleteChars=undefined};r.m3uList=r.m3uList||[];r.liteSortTypes=r.liteSortTypes||[]}cfg.value=r;if(cfg.value.liteSortTypes)liteSortText.value=cfg.value.liteSortTypes.join('\\n')}),
+     http(api.base+'/get').then(function(r){if(r&&typeof r==='object'){r.groupReplaceRules=r.groupReplaceRules||{};r.nameReplaceRules=r.nameReplaceRules||{};r.urlReplaceRules=r.urlReplaceRules||{};r.deleteGroups=r.deleteGroups||[];r.channelBlockKeywords=r.channelBlockKeywords||[];r.removalList=r.removalList||[];if(r.deleteChars){var dc=new Set(r.removalList);r.deleteChars.forEach(function(x){dc.add(x)});r.removalList=Array.from(dc);r.deleteChars=null};r.m3uList=r.m3uList||[];r.liteSortTypes=r.liteSortTypes||[]}cfg.value=r;if(cfg.value.liteSortTypes)liteSortText.value=cfg.value.liteSortTypes.join('\\n')}),
      
      http(api.base+'/channels').then(function(r){mainChannels.value=r.main||[];localChannels.value=r.local||[];
        // 格式化 channelInput
@@ -587,12 +580,12 @@
 
    return {tab,cfg,stats,mainChannels,localChannels,whiteList,blackList,health,origin,saving,loadingStats,
      speedtestRunning,speedtestProgress,speedtestLastResult,
-     newDelGroup,newBlockKey,newDelChar,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
+     newDelGroup,newBlockKey,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
      showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortText,
      menuTitle,statsOrder,
      isEmpty,copy,loadStats,updateSortGroup,
      addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
-     addDelGroup,addBlockKey,addDelChar,addRemoval,addUrlRule,renameUrlRule,
+     addDelGroup,addBlockKey,addRemoval,addUrlRule,renameUrlRule,
      addWhiteListItem,removeWhite,addBlackListItem,removeBlack,
      startSpeedtest,pollSpeedtest,exportConfig,importConfig,resetConfig,saveAll,initSortable,goto,triggerImport}
  }});
