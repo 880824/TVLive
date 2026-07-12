@@ -166,6 +166,10 @@
              </div>
            </div>
            <div v-if="Object.keys(stats||{}).length===0" style="color:var(--text3);font-size:12px;padding:8px 0;">点击刷新加载统计数据</div>
+           <div style="margin-top:8px"><div class="tag-item" style="cursor:default;border-style:dashed">
+             <input class="tag-input" v-model="newGroupName" placeholder="新增频道组" @keyup.enter="addSortGroup">
+             <button class="btn btn-outline btn-xs" @click="addSortGroup">+ 添加</button>
+           </div></div>
          </div>
        </div>
       <div class="panel">
@@ -177,14 +181,14 @@
           <div class="tag-grid" ref="liteSortGridRef">
             <div v-for="(item,i) in (liteSortList||[])" :key="i" class="tag-item" :data-idx="i">
               <span style="cursor:grab;color:var(--text3)">&#9776;</span>
-              <input class="tag-input" :value="item" @change="updateLiteSortItem(i,$event.target.value)" style="width:100%">
+              <input class="tag-input" :value="item" @change="updateLiteSortItem(i,$event.target.value)">
               <span class="tag-count">{{0}}</span>
             </div>
           </div>
-          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-            <input class="form-input" v-model="newLiteCat" placeholder="新增精简分类" style="flex:1;max-width:200px;font-size:12px;padding:4px 8px">
-            <button class="btn btn-outline btn-sm" @click="addLiteCat">+ 添加</button>
-          </div>
+          <div style="margin-top:8px"><div class="tag-item" style="cursor:default;border-style:dashed">
+            <input class="tag-input" v-model="newLiteCat" placeholder="新增精简分类" @keyup.enter="addLiteCat">
+            <button class="btn btn-outline btn-xs" @click="addLiteCat">+ 添加</button>
+          </div></div>
         </div>
       </div>
 
@@ -460,7 +464,7 @@
    var newDelGroup=Vue.ref('');var newBlockKey=Vue.ref('');var newRemoval=Vue.ref('');
    var newUrlFrom=Vue.ref('');var newUrlTo=Vue.ref('');var newWhiteUrl=Vue.ref('');var newBlackUrl=Vue.ref('');
    var showAddWhite=Vue.ref(false);var showAddBlack=Vue.ref(false);
-   var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);
+   var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);var newGroupName=Vue.ref('');
    var liteSortText=Vue.ref('');var newLiteCat=Vue.ref('');
 
    var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单'};return t[tab.value]||''});
@@ -507,6 +511,7 @@
    function goto(t){tab.value=t}
    function updateLiteSortItem(i,v){if(cfg.value.liteSortTypes)cfg.value.liteSortTypes[i]=v}
    function addLiteCat(){if(newLiteCat.value.trim()){if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(newLiteCat.value.trim());newLiteCat.value=''}}
+   function addSortGroup(){var n=newGroupName.value.trim();if(!n)return;if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder.push(n);newGroupName.value=''}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
      http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
    function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0){http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});http(api.base+'/blacklist').then(function(b){blackList.value=b||[]})};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
@@ -558,9 +563,9 @@
    return {tab,cfg,stats,mainChannels,localChannels,whiteList,blackList,health,origin,saving,loadingStats,
      speedtestRunning,speedtestProgress,speedtestLastResult,
      newDelGroup,newBlockKey,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
-     showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortText,
+     showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortText,newGroupName,
      menuTitle,statsOrder,
-     isEmpty,copy,loadStats,updateSortGroup,
+     isEmpty,copy,loadStats,updateSortGroup,addSortGroup,
      addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
      addDelGroup,addBlockKey,addRemoval,addUrlRule,renameUrlRule,
      addWhiteListItem,removeWhite,addBlackListItem,removeBlack,
