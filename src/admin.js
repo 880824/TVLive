@@ -527,7 +527,7 @@
    function triggerImport(){document.getElementById('importFile').click()}
    function exportConfig(){var blob=new Blob([JSON.stringify(cfg.value,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='iptv-config.json';a.click();toast('配置已导出')}
    function importConfig(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){try{var data=JSON.parse(ev.target.result);Object.assign(cfg.value,data);toast('配置已导入')}catch(err){toast('导入失败: '+err.message)}};reader.readAsText(file,'utf-8')}
-   function resetConfig(){if(confirm('确认恢复默认配置？当前修改将丢失。')){location.reload()}}
+   function resetConfig(){if(!confirm('确认恢复默认配置？\n当前修改（含频道分类与纠错规则）将全部丢失。'))return;http(api.base+'/reset',{method:'POST'}).then(function(){toast('已恢复默认配置');location.reload()}).catch(function(){toast('恢复失败，请重试')})}
 
    function saveAll(){saving.value=true;
      // 同步精简版分类文本
