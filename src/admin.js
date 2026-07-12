@@ -166,7 +166,7 @@
                <span class="tag-count">{{item.count||0}}</span>
              </div>
            </div>
-           <div v-if="Object.keys(stats).length===0" style="color:var(--text3);font-size:12px;padding:8px 0;">点击刷新加载统计数据</div>
+           <div v-if="Object.keys(stats||{}).length===0" style="color:var(--text3);font-size:12px;padding:8px 0;">点击刷新加载统计数据</div>
          </div>
        </div>
 
@@ -382,7 +382,7 @@
          </div></div>
        </div>
        <div class="panel">
-         <div class="panel-header">频道地址替换 <span class="badge badge-info">{{Object.keys(cfg.urlReplaceRules).length}}</span></div>
+         <div class="panel-header">频道地址替换 <span class="badge badge-info">{{Object.keys(cfg.urlReplaceRules||{}).length}}</span></div>
          <div class="panel-body">
            <div v-for="(to,from) in (cfg.urlReplaceRules||{})" :key="from" class="mapping-row">
              <input class="form-input" :value="from" @change="renameUrlRule(from,$event.target.value)" style="flex:1;font-family:monospace;font-size:11px;padding:4px 6px"><span class="mapping-sep">&#8594;</span>
@@ -591,9 +591,7 @@
      showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortText,
      menuTitle,statsOrder,
      isEmpty,copy,loadStats,updateSortGroup,
-     addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,
-     addCorrection,
-     addGroupRule,renameGroupRule,addNameRule,renameNameRule,
+     addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
      addDelGroup,addBlockKey,addDelChar,addRemoval,addUrlRule,renameUrlRule,
      addWhiteListItem,removeWhite,addBlackListItem,removeBlack,
      startSpeedtest,pollSpeedtest,exportConfig,importConfig,resetConfig,saveAll,initSortable,goto,triggerImport}
