@@ -94,7 +94,7 @@
  .textarea-large:focus{border-color:var(--accent)}
  .url-row{display:flex;align-items:center;padding:8px 12px;background:#1A1A1A;border-radius:6px;font-size:12px;gap:8px;flex-wrap:wrap}
  .url-label{font-weight:600;color:var(--text2);flex-shrink:0;font-size:11px}
- .url-value{color:var(--accent);font-family:monospace;font-size:12px;flex:1;word-break:break-all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.col-name{max-width:150px;width:auto}.col-url{min-width:0;width:auto}.col-ua{width:130px}
+ .url-value{color:var(--accent);font-family:monospace;font-size:12px;flex:1;word-break:break-all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.col-name{max-width:100px;width:auto}.col-url{min-width:0;width:auto}.col-ua{width:130px}
  a.url-value{text-decoration:none}a.url-value:hover{text-decoration:underline}
  .help-text{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.6}
  .help-text code{background:#1A1A1A;padding:1px 5px;border-radius:3px;font-size:10px;color:var(--accent)}
@@ -174,7 +174,9 @@
       
         </div>
       </div>
-      <div class="panel">
+      
+      </div>
+<div class="panel">
         <div class="panel-header">
           <span>精简版分类设置</span>
           <span style="font-size:11px;color:var(--text3)">拖拽排序</span>
@@ -191,8 +193,7 @@
             <input class="form-input" v-model="newLiteCat" placeholder="新增精简分类" style="flex:1;max-width:200px;font-size:12px;padding:4px 8px">
             <button class="btn btn-outline btn-sm" @click="addLiteCat">+ 添加</button>
           </div>
-        </div>
-      </div><div class="panel">
+        </div><div class="panel">
          <div class="panel-header">配置管理</div>
          <div class="panel-body flex flex-wrap gap-2">
            <button class="btn btn-primary" @click="exportConfig">&#128229; 导出配置</button>
@@ -208,22 +209,7 @@
        <div class="page-title">订阅源管理</div>
        <div class="page-sub">管理 M3U/TXT 订阅源地址、EPG 配置与健康状态</div>
 
-       <div class="panel">
-         <div class="panel-header">
-           <span>EPG 与多路线设置</span>
-   
-             </div>
-         <div class="panel-body">
-           <div class="url-row"><span class="url-label">EPG 地址</span><input class="form-input" v-model="cfg.epgUrl" style="flex:1;font-family:monospace;font-size:12px;"></div>
-           <div class="flex gap-4 mt-2">
-             <label class="flex items-center gap-2" style="font-size:12px;color:var(--text2)">启用 EPG <div class="switch" :class="{on:cfg.enableEpg}" @click="cfg.enableEpg=!cfg.enableEpg"></div></label>
-             <label class="flex items-center gap-2" style="font-size:12px;color:var(--text2)">多路线 <div class="switch" :class="{on:cfg.enableMultiSource}" @click="cfg.enableMultiSource=!cfg.enableMultiSource"></div></label>
-             <label class="flex items-center gap-2" style="font-size:12px;color:var(--text2)">单频道上限 <input class="form-input" type="number" v-model.number="cfg.singleChannelMaxCount" style="width:60px;padding:3px 6px;font-size:12px;"></label>
-           </div>
-         </div>
-       </div>
-
-              <div style="display:flex;gap:14px;flex-wrap:wrap">
+             <div style="display:flex;gap:14px;flex-wrap:wrap">
         <div class="panel" style="flex:1;min-width:280px">
           <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between">
             <span>Logo 设置</span>
@@ -236,20 +222,13 @@
         <div class="panel" style="flex:1;min-width:280px">
           <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between">
             <span>User-Agent</span>
-            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px">超时(秒) <input class="form-input" type="number" v-model.number="cfg.fetchTimeout" style="width:50px;padding:2px 5px;font-size:11px"></label>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px">远程源拉取超时（秒）<input class="form-input" type="number" v-model.number="cfg.fetchTimeout" style="width:50px;padding:2px 5px;font-size:11px"></label>
           </div>
           <div class="panel-body">
             <input class="form-input" v-model="cfg.userAgent" placeholder="Mozilla/5.0 ..." style="font-family:monospace;font-size:12px">
           </div>
         </div>
       </div>
-<div class="panel">
-         <div class="panel-header">
-           <span>订阅源列表</span>
-           <div class="flex gap-2 items-center">
-             <button class="btn btn-outline btn-sm" @click="checkHealth">健康检测</button>
-             <button class="btn btn-outline btn-sm" @click="addM3u">+ 添加</button>
-           </div>
          </div>
          <div class="panel-body" style="padding:0">
            <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th style="max-width:80px;width:auto">名称</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:30px"></th></tr></thead>
