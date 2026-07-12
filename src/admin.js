@@ -43,7 +43,7 @@
  .sidebar-logo span{color:var(--accent)}.sidebar-nav{flex:1;padding:6px;display:flex;flex-direction:column;gap:1px;overflow-y:auto}
  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;color:rgba(255,255,255,.5);cursor:pointer;transition:.12s;font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left;font-family:inherit}
  .nav-item:hover{background:#1F1F1F;color:rgba(255,255,255,.85)}.nav-item.active{background:var(--accent-bg);color:var(--accent);font-weight:600}
- .nav-icon{flex-shrink:0;font-size:15px}
+ .nav-icon{width:20px;text-align:center;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
  .sidebar-footer{padding:10px 8px;border-top:1px solid rgba(255,255,255,.06)}
  .save-btn{width:100%;padding:9px;border-radius:6px;background:var(--accent);color:#141414;border:none;font-weight:700;font-size:13px;cursor:pointer;transition:.12s;font-family:inherit}
  .save-btn:hover{background:#00B894}.save-btn:disabled{opacity:.5;cursor:not-allowed}
@@ -94,7 +94,7 @@
  .textarea-large:focus{border-color:var(--accent)}
  .url-row{display:flex;align-items:center;padding:8px 12px;background:#1A1A1A;border-radius:6px;font-size:12px;gap:8px;flex-wrap:wrap}
  .url-label{font-weight:600;color:var(--text2);flex-shrink:0;font-size:11px}
- .url-value{color:var(--accent);font-family:monospace;font-size:12px;flex:1;word-break:break-all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .url-value{color:var(--accent);font-family:monospace;font-size:12px;flex:1;word-break:break-all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.col-name{max-width:150px;width:auto}.col-url{min-width:0;width:auto}.col-ua{width:130px}
  a.url-value{text-decoration:none}a.url-value:hover{text-decoration:underline}
  .help-text{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.6}
  .help-text code{background:#1A1A1A;padding:1px 5px;border-radius:3px;font-size:10px;color:var(--accent)}
@@ -124,12 +124,10 @@
      <button class="nav-item" :class="{active:tab==='overview'}" @click="goto('overview')"><span class="nav-icon">&#9635;</span>汇总概况</button>
      <button class="nav-item" :class="{active:tab==='sources'}" @click="goto('sources')"><span class="nav-icon">&#9881;</span>订阅管理</button>
      <button class="nav-item" :class="{active:tab==='categories'}" @click="goto('categories')"><span class="nav-icon">&#9776;</span>频道分类</button>
-     <button class="nav-item" :class="{active:tab==='corrections'}" @click="goto('corrections')"><span class="nav-icon">&#9998;</span>名称纠错</button>
      <button class="nav-item" :class="{active:tab==='mapping'}" @click="goto('mapping')"><span class="nav-icon">&#8596;</span>规则映射</button>
      <button class="nav-item" :class="{active:tab==='filter'}" @click="goto('filter')"><span class="nav-icon">&#128683;</span>屏蔽过滤</button>
      <button class="nav-item" :class="{active:tab==='blacklist'}" @click="goto('blacklist')"><span class="nav-icon">&#128308;</span>黑白名单</button>
      <button class="nav-item" :class="{active:tab==='speedtest'}" @click="goto('speedtest')"><span class="nav-icon">&#9889;</span>测速中心</button>
-     <button class="nav-item" :class="{active:tab==='output'}" @click="goto('output')"><span class="nav-icon">&#128187;</span>输出设置</button>
    </nav>
    <div class="sidebar-footer">
      <button class="save-btn" @click="saveAll" :disabled="saving">{{saving?'保存中...':'保存全部配置'}}</button>
@@ -176,7 +174,7 @@
          <div class="panel-header">配置管理</div>
          <div class="panel-body flex flex-wrap gap-2">
            <button class="btn btn-primary" @click="exportConfig">&#128229; 导出配置</button>
-           <button class="btn btn-outline" @click="document.getElementById('importFile').click()">&#128228; 导入配置</button>
+           <button class="btn btn-outline" @click="triggerImport()">&#128228; 导入配置</button>
            <button class="btn btn-outline" style="color:var(--danger)" @click="resetConfig">&#8634; 恢复默认</button>
            <input type="file" id="importFile" style="display:none" accept=".json" @change="importConfig">
          </div>
@@ -191,7 +189,26 @@
        <div class="panel">
          <div class="panel-header">
            <span>EPG 与多路线设置</span>
+   
+       <div class="panel">
+         <div class="panel-header">
+           <span>精简版分类设置</span>
+           <span style="font-size:11px;color:var(--text3)">拖拽排序</span>
          </div>
+         <div class="panel-body">
+           <div class="tag-grid" ref="liteSortGridRef">
+             <div v-for="(item,i) in (cfg.liteSortTypes||[])" :key="i" class="tag-item" :data-idx="i">
+               <span style="cursor:grab;color:var(--text3)">&#9776;</span>
+               <input class="tag-input" :value="item" @change="updateLiteSortItem(i,$event.target.value)" style="width:100%">
+               <span class="tag-count">{{0}}</span>
+             </div>
+           </div>
+           <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+             <input class="form-input" v-model="newLiteCat" placeholder="新增精简分类" style="flex:1;max-width:200px;font-size:12px;padding:4px 8px">
+             <button class="btn btn-outline btn-sm" @click="addLiteCat">+ 添加</button>
+           </div>
+         </div>
+       </div>      </div>
          <div class="panel-body">
            <div class="url-row"><span class="url-label">EPG 地址</span><input class="form-input" v-model="cfg.epgUrl" style="flex:1;font-family:monospace;font-size:12px;"></div>
            <div class="flex gap-4 mt-2">
@@ -202,7 +219,21 @@
          </div>
        </div>
 
+              <div class="panel">
+         <div class="panel-header">Logo 设置</div>
+         <div class="panel-body">
+           <div class="form-group"><label class="form-label">Logo 地址模板</label><input class="form-input" v-model="cfg.logoTemplate" placeholder="https://example.com/logo/{}.png" style="font-family:monospace;font-size:12px"></div>
+           <div class="flex items-center gap-3"><label class="flex items-center gap-2" style="font-size:12px;color:var(--text2)">启用 Logo <div class="switch" :class="{on:cfg.enableLogo}" @click="cfg.enableLogo=!cfg.enableLogo"></div></label></div>
+         </div>
+       </div>
        <div class="panel">
+         <div class="panel-header">User-Agent</div>
+         <div class="panel-body">
+           <div class="form-group"><label class="form-label">默认 User-Agent（拉取订阅源时使用）</label><input class="form-input" v-model="cfg.userAgent" style="font-family:monospace;font-size:12px"></div>
+           <div class="form-group"><label class="form-label">远程源拉取超时（秒）</label><input class="form-input" type="number" v-model.number="cfg.fetchTimeout" style="width:100px"></div>
+         </div>
+       </div>
+<div class="panel">
          <div class="panel-header">
            <span>订阅源列表</span>
            <div class="flex gap-2 items-center">
@@ -211,7 +242,7 @@
            </div>
          </div>
          <div class="panel-body" style="padding:0">
-           <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th>名称</th><th>订阅源地址</th><th style="width:120px">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:30px"></th></tr></thead>
+           <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th style="max-width:150px;width:auto">名称</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:30px"></th></tr></thead>
            <tbody ref="m3uTableRef">
              <tr v-for="(s,i) in cfg.m3uList" :key="s.__id||i" :data-idx="i">
                <td style="cursor:grab;color:var(--text3);text-align:center;width:30px">&#9776;</td>
@@ -264,35 +295,6 @@
                <td><button class="del-btn" @click="localChannels.splice(i,1)">&times;</button></td>
              </tr>
            </tbody></table>
-         </div>
-       </div>
-     </div>
-
-     <!-- ===== 名称纠错 ===== -->
-     <div class="page" :class="{active:tab==='corrections'}">
-       <div class="page-title">频道名称纠错</div>
-       <div class="page-sub">管理别名→标准名映射规则，共 {{correctionKeys.length}} 条规则</div>
-       <div class="panel">
-         <div class="panel-header">
-           <span>纠错规则</span>
-           <div class="flex gap-2">
-             <button class="btn btn-outline btn-sm" @click="addCorrection">+ 添加</button>
-             <button class="btn btn-outline btn-sm" @click="importCorrections">批量导入</button>
-           </div>
-         </div>
-         <div class="panel-body" style="padding:0">
-           <table><thead><tr><th style="width:180px">别名（原始名）</th><th>标准名</th><th style="width:30px"></th></tr></thead>
-           <tbody id="corrections-body">
-             <tr v-for="(val,key,i) in corrections" :key="key">
-               <td><input class="form-input" :value="key" @change="renameCorrection(key,i,$event.target.value)" style="font-family:monospace;font-size:11px;padding:3px 6px"></td>
-               <td><input class="form-input" :value="val" @change="corrections[$event.target.value]=corrections[key];if($event.target.value!==key)delete corrections[key]" style="font-family:monospace;font-size:11px;padding:3px 6px" @blur="saveCorrectionsOnly"></td>
-               <td><button class="del-btn" @click="delete corrections[key];saveCorrectionsOnly()">&times;</button></td>
-             </tr>
-           </tbody></table>
-         </div>
-         <div class="panel-body" v-if="showCorrectionImport">
-           <textarea class="textarea-large" v-model="correctionImportText" placeholder="每行格式：标准名,别名1,别名2,..."></textarea>
-           <div class="flex gap-2 mt-2"><button class="btn btn-primary btn-sm" @click="doImportCorrections">导入</button><button class="btn btn-outline btn-sm" @click="showCorrectionImport=false">取消</button></div>
          </div>
        </div>
      </div>
@@ -469,39 +471,7 @@
        </div>
      </div>
 
-     <!-- ===== 输出设置 ===== -->
-     <div class="page" :class="{active:tab==='output'}">
-       <div class="page-title">输出设置</div>
-       <div class="page-sub">控制播放列表的输出格式、Logo 和 EPG 配置</div>
-
-       <div class="panel">
-         <div class="panel-header">Logo 设置</div>
-         <div class="panel-body">
-           <div class="form-group"><label class="form-label">Logo 地址模板</label><input class="form-input" v-model="cfg.logoTemplate" placeholder="https://example.com/logo/{}.png" style="font-family:monospace;font-size:12px"></div>
-           <div class="flex items-center gap-3"><label class="flex items-center gap-2" style="font-size:12px;color:var(--text2)">启用 Logo <div class="switch" :class="{on:cfg.enableLogo}" @click="cfg.enableLogo=!cfg.enableLogo"></div></label></div>
-           <div class="help-text mt-2">在 M3U 输出中注入 <code>tvg-logo</code> 属性。<code>{}</code> 会被替换为频道名。</div>
-         </div>
-       </div>
-
-       <div class="panel">
-         <div class="panel-header">精简版分类设置</div>
-         <div class="panel-body">
-           <div class="form-group"><label class="form-label">精简版包含的分类（每行一个分类名）</label>
-           <textarea class="textarea-large" v-model="liteSortText" style="min-height:120px"></textarea></div>
-           <div class="help-text">只在精简版（lite.m3u/lite.txt）中包含这些分类。完整版包含所有分类。</div>
-         </div>
-       </div>
-
-       <div class="panel">
-         <div class="panel-header">User-Agent</div>
-         <div class="panel-body">
-           <div class="form-group"><label class="form-label">默认 User-Agent（拉取订阅源时使用）</label><input class="form-input" v-model="cfg.userAgent" style="font-family:monospace;font-size:12px"></div>
-           <div class="form-group"><label class="form-label">远程源拉取超时（秒）</label><input class="form-input" type="number" v-model.number="cfg.fetchTimeout" style="width:100px"></div>
-         </div>
-       </div>
-     </div>
-
-   </div>
+        </div>
  </div>
  </div>
 
@@ -511,8 +481,8 @@
  function http(url,opts){return fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json'},...opts}).then(function(r){return r.json()})}
    try{var app=Vue.createApp({setup(){
    var tab=Vue.ref('overview');
-   var cfg=Vue.ref({m3uList:[],deleteGroups:[],channelBlockKeywords:[],deleteChars:[],removalList:[],groupReplaceRules:{},nameReplaceRules:{},urlReplaceRules:{},epgUrl:'',enableEpg:true,logoTemplate:'',enableLogo:true,enableMultiSource:true,singleChannelMaxCount:5,responseTimeThreshold:2000,speedtestInterval:3,userAgent:'',fetchTimeout:10,liteSortTypes:[]});
-   var stats=Vue.ref({});var mainChannels=Vue.ref([]);var localChannels=Vue.ref([]);var corrections=Vue.ref({});
+   var cfg=Vue.ref({m3uList:[],deleteGroups:[],channelBlockKeywords:[],removalList:[],groupReplaceRules:{},nameReplaceRules:{},urlReplaceRules:{},epgUrl:'',enableEpg:true,logoTemplate:'',enableLogo:true,enableMultiSource:true,singleChannelMaxCount:5,responseTimeThreshold:2000,speedtestInterval:3,userAgent:'',fetchTimeout:10,liteSortTypes:[]});
+   var stats=Vue.ref({});var mainChannels=Vue.ref([]);var localChannels=Vue.ref([]);
    var whiteList=Vue.ref([]);var blackList=Vue.ref([]);var health=Vue.ref({});
    var origin=Vue.ref('');var saving=Vue.ref(false);var loadingStats=Vue.ref(false);
    var speedtestRunning=Vue.ref(false);var speedtestProgress=Vue.ref({completed:0,total:0,passed:0,failed:0,progress:0});
@@ -521,11 +491,11 @@
    var newUrlFrom=Vue.ref('');var newUrlTo=Vue.ref('');var newWhiteUrl=Vue.ref('');var newBlackUrl=Vue.ref('');
    var showAddWhite=Vue.ref(false);var showAddBlack=Vue.ref(false);
    var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);
-   var liteSortText=Vue.ref('');
+   var liteSortText=Vue.ref('');var newLiteCat=Vue.ref('');
 
-   var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','corrections':'名称纠错','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单','speedtest':'测速中心','output':'输出设置'};return t[tab.value]||''});
-   var correctionKeys=Vue.computed(function(){return Object.keys(corrections.value || {})});
-   var statsOrder=Vue.computed(function(){var o=cfg.value.sortOrder||[];var s=stats.value;var r=[];for(var g of o){r.push({group:g,count:s[g]||0})}var used=new Set(o);for(var g in s){if(!used.has(g))r.push({group:g,count:s[g]})}return r});
+   var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单','speedtest':'测速中心'};return t[tab.value]||''});
+   
+   var liteSortGridRef=Vue.ref(null);var liteSortList=Vue.computed(function(){return cfg.value.liteSortTypes||[]});var liteSortCounts=Vue.computed(function(){var o={};var s=stats.value||{};for(var k in s)o[k]=s[k];return o});var statsOrder=Vue.computed(function(){var o=cfg.value.sortOrder||[];var s=stats.value;var r=[];for(var g of o){r.push({group:g,count:s[g]||0})}var used=new Set(o);for(var g in s){if(!used.has(g))r.push({group:g,count:s[g]})}return r});
 
    function isEmpty(obj){if(!obj)return true;for(var k in obj)return false;return true}
    function copy(t){navigator.clipboard.writeText(t).then(function(){toast('已复制: '+t)})}
@@ -567,10 +537,13 @@
    function saveBlacklistOnly(){http(api.base+'/blacklist/save',{method:'POST',body:JSON.stringify(blackList.value.map(function(b){return typeof b==='string'?b:b.url}))}).then(function(){http(api.base+'/whitelist/save',{method:'POST',body:JSON.stringify(whiteList.value)}).then(function(){toast('黑白名单已保存')})})}
 
    function goto(t){tab.value=t}
+   function updateLiteSortItem(i,v){if(cfg.value.liteSortTypes)cfg.value.liteSortTypes[i]=v}
+   function addLiteCat(){if(newLiteCat.value.trim()){if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(newLiteCat.value.trim());newLiteCat.value=''}}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
      http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
-   function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
+   function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0){http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});http(api.base+'/blacklist').then(function(b){blackList.value=b||[]})};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
 
+   function triggerImport(){document.getElementById('importFile').click()}
    function exportConfig(){var blob=new Blob([JSON.stringify(cfg.value,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='iptv-config.json';a.click();toast('配置已导出')}
    function importConfig(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){try{var data=JSON.parse(ev.target.result);Object.assign(cfg.value,data);toast('配置已导入')}catch(err){toast('导入失败: '+err.message)}};reader.readAsText(file,'utf-8')}
    function resetConfig(){if(confirm('确认恢复默认配置？当前修改将丢失。')){location.reload()}}
@@ -584,14 +557,14 @@
 
      Promise.all([
        http(api.base+'/save',{method:'POST',body:JSON.stringify(cfg.value)}),
-       http(api.base+'/corrections/save',{method:'POST',body:JSON.stringify(corrections.value)}),
+       
        http(api.base+'/channels/save',{method:'POST',body:JSON.stringify({main:mainChannels.value,local:localChannels.value})}),
        http(api.base+'/whitelist/save',{method:'POST',body:JSON.stringify(whiteList.value)}),
        http(api.base+'/blacklist/save',{method:'POST',body:JSON.stringify(blackList.value.map(function(b){return typeof b==='string'?b:b.url}))})
      ]).then(function(){saving.value=false;toast('全部配置已保存')}).catch(function(){saving.value=false;toast('保存失败，请重试')})
    }
 
-   function initSortable(){Vue.nextTick(function(){
+   function initSortable(){Vue.nextTick(function(){if(liteSortGridRef.value)Sortable.create(liteSortGridRef.value,{animation:150,handle:'.tag-item',onEnd:function(ev){var list=cfg.value.liteSortTypes||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value={...cfg.value}}});
      if(sortGridRef.value)Sortable.create(sortGridRef.value,{animation:150,handle:'.tag-item',onEnd:function(ev){var list=cfg.value.sortOrder||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value.sortOrder=list;cfg.value={...cfg.value}}});
      if(m3uTableRef.value)Sortable.create(m3uTableRef.value,{animation:150,handle:'tr',onEnd:function(ev){var list=cfg.value.m3uList||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value={...cfg.value}}});
    })}
@@ -599,8 +572,8 @@
    // 加载初始数据
    origin.value=window.location.origin;
    Promise.all([
-     http(api.base+'/get').then(function(r){if(r&&typeof r==='object'){r.groupReplaceRules=r.groupReplaceRules||{};r.nameReplaceRules=r.nameReplaceRules||{};r.urlReplaceRules=r.urlReplaceRules||{};r.deleteGroups=r.deleteGroups||[];r.deleteChars=r.deleteChars||[];r.channelBlockKeywords=r.channelBlockKeywords||[];r.removalList=r.removalList||[];r.m3uList=r.m3uList||[];r.liteSortTypes=r.liteSortTypes||[]}cfg.value=r;if(cfg.value.liteSortTypes)liteSortText.value=cfg.value.liteSortTypes.join('\\n')}),
-     http(api.base+'/corrections').then(function(r){corrections.value=r||{}}),
+     http(api.base+'/get').then(function(r){if(r&&typeof r==='object'){r.groupReplaceRules=r.groupReplaceRules||{};r.nameReplaceRules=r.nameReplaceRules||{};r.urlReplaceRules=r.urlReplaceRules||{};r.deleteGroups=r.deleteGroups||[];r.channelBlockKeywords=r.channelBlockKeywords||[];r.removalList=r.removalList||[];if(r.deleteChars){var dc=new Set(r.removalList);r.deleteChars.forEach(function(x){dc.add(x)});r.removalList=Array.from(dc);r.deleteChars=undefined};r.m3uList=r.m3uList||[];r.liteSortTypes=r.liteSortTypes||[]}cfg.value=r;if(cfg.value.liteSortTypes)liteSortText.value=cfg.value.liteSortTypes.join('\\n')}),
+     
      http(api.base+'/channels').then(function(r){mainChannels.value=r.main||[];localChannels.value=r.local||[];
        // 格式化 channelInput
        for(var cat of mainChannels.value){cat.channelInput=(cat.channels||[]).join(', ')}
@@ -618,14 +591,14 @@
      speedtestRunning,speedtestProgress,speedtestLastResult,showCorrectionImport,correctionImportText,
      newDelGroup,newBlockKey,newDelChar,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
      showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortText,
-     menuTitle,correctionKeys,statsOrder,
+     menuTitle,statsOrder,
      isEmpty,copy,loadStats,updateSortGroup,
      addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,
      addCorrection,renameCorrection,importCorrections,doImportCorrections,saveCorrectionsOnly,
      addGroupRule,renameGroupRule,addNameRule,renameNameRule,
      addDelGroup,addBlockKey,addDelChar,addRemoval,addUrlRule,renameUrlRule,
      addWhiteListItem,removeWhite,addBlackListItem,removeBlack,
-     startSpeedtest,pollSpeedtest,exportConfig,importConfig,resetConfig,saveAll,initSortable,goto}
+     startSpeedtest,pollSpeedtest,exportConfig,importConfig,resetConfig,saveAll,initSortable,goto,triggerImport}
  }});
  app.mount('#app');}catch(e){document.getElementById('toast').textContent='Vue error: '+e.message;document.getElementById('toast').style.display='block'}
  </script>
