@@ -121,15 +121,15 @@
  <aside class="sidebar">
    <div class="sidebar-logo"><span>IPTV</span> Manager</div>
    <nav class="sidebar-nav">
-     <button class="nav-item" :class="{active:tab==='overview'}" @click="tab='overview'"><span class="nav-icon">&#9635;</span>汇总概况</button>
-     <button class="nav-item" :class="{active:tab==='sources'}" @click="tab='sources'"><span class="nav-icon">&#9881;</span>订阅管理</button>
-     <button class="nav-item" :class="{active:tab==='categories'}" @click="tab='categories'"><span class="nav-icon">&#9776;</span>频道分类</button>
-     <button class="nav-item" :class="{active:tab==='corrections'}" @click="tab='corrections'"><span class="nav-icon">&#9998;</span>名称纠错</button>
-     <button class="nav-item" :class="{active:tab==='mapping'}" @click="tab='mapping'"><span class="nav-icon">&#8596;</span>规则映射</button>
-     <button class="nav-item" :class="{active:tab==='filter'}" @click="tab='filter'"><span class="nav-icon">&#128683;</span>屏蔽过滤</button>
-     <button class="nav-item" :class="{active:tab==='blacklist'}" @click="tab='blacklist'"><span class="nav-icon">&#128308;</span>黑白名单</button>
-     <button class="nav-item" :class="{active:tab==='speedtest'}" @click="tab='speedtest'"><span class="nav-icon">&#9889;</span>测速中心</button>
-     <button class="nav-item" :class="{active:tab==='output'}" @click="tab='output'"><span class="nav-icon">&#128187;</span>输出设置</button>
+     <button class="nav-item" :class="{active:tab==='overview'}" @click="goto('overview')"><span class="nav-icon">&#9635;</span>汇总概况</button>
+     <button class="nav-item" :class="{active:tab==='sources'}" @click="goto('sources')"><span class="nav-icon">&#9881;</span>订阅管理</button>
+     <button class="nav-item" :class="{active:tab==='categories'}" @click="goto('categories')"><span class="nav-icon">&#9776;</span>频道分类</button>
+     <button class="nav-item" :class="{active:tab==='corrections'}" @click="goto('corrections')"><span class="nav-icon">&#9998;</span>名称纠错</button>
+     <button class="nav-item" :class="{active:tab==='mapping'}" @click="goto('mapping')"><span class="nav-icon">&#8596;</span>规则映射</button>
+     <button class="nav-item" :class="{active:tab==='filter'}" @click="goto('filter')"><span class="nav-icon">&#128683;</span>屏蔽过滤</button>
+     <button class="nav-item" :class="{active:tab==='blacklist'}" @click="goto('blacklist')"><span class="nav-icon">&#128308;</span>黑白名单</button>
+     <button class="nav-item" :class="{active:tab==='speedtest'}" @click="goto('speedtest')"><span class="nav-icon">&#9889;</span>测速中心</button>
+     <button class="nav-item" :class="{active:tab==='output'}" @click="goto('output')"><span class="nav-icon">&#128187;</span>输出设置</button>
    </nav>
    <div class="sidebar-footer">
      <button class="save-btn" @click="saveAll" :disabled="saving">{{saving?'保存中...':'保存全部配置'}}</button>
@@ -510,7 +510,8 @@
  function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.style.display='block';setTimeout(function(){el.style.display='none'},3000)}
  function http(url,opts){return fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json'},...opts}).then(function(r){return r.json()})}
 
- var app=Vue.createApp({setup(){
+ try{
+   try{var app=Vue.createApp({setup(){
    var tab=Vue.ref('overview');
    var cfg=Vue.ref({m3uList:[],deleteGroups:[],channelBlockKeywords:[],deleteChars:[],removalList:[],groupReplaceRules:{},nameReplaceRules:{},urlReplaceRules:{},epgUrl:'',enableEpg:true,logoTemplate:'',enableLogo:true,enableMultiSource:true,singleChannelMaxCount:5,responseTimeThreshold:2000,speedtestInterval:3,userAgent:'',fetchTimeout:10,liteSortTypes:[]});
    var stats=Vue.ref({});var mainChannels=Vue.ref([]);var localChannels=Vue.ref([]);var corrections=Vue.ref({});
@@ -567,6 +568,7 @@
    function removeBlack(i){blackList.value.splice(i,1);saveBlacklistOnly()}
    function saveBlacklistOnly(){http(api.base+'/blacklist/save',{method:'POST',body:JSON.stringify(blackList.value.map(function(b){return typeof b==='string'?b:b.url}))}).then(function(){http(api.base+'/whitelist/save',{method:'POST',body:JSON.stringify(whiteList.value)}).then(function(){toast('黑白名单已保存')})})}
 
+   function goto(t){tab.value=t}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
      http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
    function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
@@ -625,10 +627,13 @@
      addGroupRule,renameGroupRule,addNameRule,renameNameRule,
      addDelGroup,addBlockKey,addDelChar,addRemoval,addUrlRule,renameUrlRule,
      addWhiteListItem,removeWhite,addBlackListItem,removeBlack,
-     startSpeedtest,pollSpeedtest,exportConfig,importConfig,resetConfig,saveAll,initSortable}
+     startSpeedtest,pollSpeedtest,exportConfig,importConfig,resetConfig,saveAll,initSortable,goto}
  }});
- app.mount('#app');
+ try{app.mount('#app');}catch(e){document.getElementById('toast').textContent='Vue error: '+e.message;document.getElementById('toast').style.display='block'}
  </script>
  </body>
  </html>`;
  }
+
+
+
