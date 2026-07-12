@@ -5,7 +5,7 @@
  
  import { getConfig, saveConfig, getCorrections, saveCorrections,
   getMainChannels, saveMainChannels, getLocalChannels, saveLocalChannels,
-  getBlacklist, saveBlacklist, getWhitelist, saveWhitelist,
+  getBlacklist, saveBlacklist, getWhitelist, saveWhitelist, resetToDefaults,
  } from './config.js';
  import { runPipeline, getStatsOnly } from './pipeline.js';
  import { startSpeedtest, processSpeedtestChunk, getSpeedtestProgress,
@@ -112,6 +112,12 @@
      if (path === '/config/api/save' && method === 'POST') {
        const data = await request.json();
        await saveConfig(env, data);
+       return jsonResponse({ success: true });
+     }
+
+     // ---- 恢复默认 ----
+     if (path === '/config/api/reset' && method === 'POST') {
+       await resetToDefaults(env);
        return jsonResponse({ success: true });
      }
  
