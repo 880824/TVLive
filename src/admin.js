@@ -310,7 +310,7 @@
            <button class="btn btn-outline btn-sm" @click="addGroupRule">+ 添加</button>
          </div>
          <div class="panel-body">
-           <div v-for="(aliases,target) in cfg.groupReplaceRules" :key="target" class="mapping-row">
+           <div v-for="(aliases,target) in (cfg.groupReplaceRules||{})" :key="target" class="mapping-row">
              <input class="form-input" :value="target" @change="renameGroupRule(target,$event.target.value)" style="width:120px;padding:4px 6px;font-size:12px;font-weight:700;color:var(--accent)">
              <span class="mapping-sep">&#8592;</span>
              <div class="mapping-sources">
@@ -332,7 +332,7 @@
            <button class="btn btn-outline btn-sm" @click="addNameRule">+ 添加</button>
          </div>
          <div class="panel-body">
-           <div v-for="(aliases,std) in cfg.nameReplaceRules" :key="std" class="mapping-row">
+           <div v-for="(aliases,std) in (cfg.nameReplaceRules||{})" :key="std" class="mapping-row">
              <input class="form-input" :value="std" @change="renameNameRule(std,$event.target.value)" style="width:100px;padding:4px 6px;font-size:12px;font-weight:700;color:var(--accent)">
              <span class="mapping-sep">=</span>
              <div class="mapping-sources">
@@ -384,7 +384,7 @@
        <div class="panel">
          <div class="panel-header">频道地址替换 <span class="badge badge-info">{{Object.keys(cfg.urlReplaceRules).length}}</span></div>
          <div class="panel-body">
-           <div v-for="(to,from) in cfg.urlReplaceRules" :key="from" class="mapping-row">
+           <div v-for="(to,from) in (cfg.urlReplaceRules||{})" :key="from" class="mapping-row">
              <input class="form-input" :value="from" @change="renameUrlRule(from,$event.target.value)" style="flex:1;font-family:monospace;font-size:11px;padding:4px 6px"><span class="mapping-sep">&#8594;</span>
              <input class="form-input" :value="to" @change="cfg.urlReplaceRules[from]=$event.target.value" style="flex:1;font-family:monospace;font-size:11px;padding:4px 6px">
              <button class="del-btn" @click="delete cfg.urlReplaceRules[from];cfg.urlReplaceRules={...cfg.urlReplaceRules}">&times;</button>
@@ -486,7 +486,7 @@
    var whiteList=Vue.ref([]);var blackList=Vue.ref([]);var health=Vue.ref({});
    var origin=Vue.ref('');var saving=Vue.ref(false);var loadingStats=Vue.ref(false);
    var speedtestRunning=Vue.ref(false);var speedtestProgress=Vue.ref({completed:0,total:0,passed:0,failed:0,progress:0});
-   var speedtestLastResult=Vue.ref(null);var showCorrectionImport=Vue.ref(false);var correctionImportText=Vue.ref('');
+   var speedtestLastResult=Vue.ref(null);
    var newDelGroup=Vue.ref('');var newBlockKey=Vue.ref('');var newDelChar=Vue.ref('');var newRemoval=Vue.ref('');
    var newUrlFrom=Vue.ref('');var newUrlTo=Vue.ref('');var newWhiteUrl=Vue.ref('');var newBlackUrl=Vue.ref('');
    var showAddWhite=Vue.ref(false);var showAddBlack=Vue.ref(false);
@@ -511,12 +511,12 @@
    function parseChannels(cat){cat.channels=cat.channelInput.split(',').map(function(s){return s.trim()}).filter(Boolean)}
    function parseChannelsLocal(cat){cat.channels=cat.channelInput.split(',').map(function(s){return s.trim()}).filter(Boolean)}
 
-   function addCorrection(){Vue.nextTick(function(){var rows=document.getElementById('corrections-body');if(rows){var last=rows.lastElementChild;if(last)last.scrollIntoView({behavior:'smooth'})}})}
-   function renameCorrection(oldKey,i,newKey){if(newKey!==oldKey){corrections.value[newKey]=corrections.value[oldKey];delete corrections.value[oldKey]}}
-   function importCorrections(){showCorrectionImport.value=true}
-   function doImportCorrections(){var lines=correctionImportText.value.split('\\n').filter(Boolean);for(var line of lines){var parts=line.split(',');if(parts.length>=2){var std=parts[0].trim();for(var j=1;j<parts.length;j++){var alias=parts[j].trim();if(alias)corrections.value[alias]=std}}}correctionImportText.value='';showCorrectionImport.value=false;toast('导入 '+lines.length+' 行')}
+   })}
+   }
+   
+   
 
-   function saveCorrectionsOnly(){http(api.base+'/corrections/save',{method:'POST',body:JSON.stringify(corrections.value)}).then(function(){toast('纠错规则已保存')})}
+   ).then(function(){toast('纠错规则已保存')})}
 
    function addGroupRule(){if(!cfg.value.groupReplaceRules)cfg.value.groupReplaceRules={};cfg.value.groupReplaceRules['新分组']=[];cfg.value.groupReplaceRules={...cfg.value.groupReplaceRules}}
    function renameGroupRule(oldKey,newKey){if(newKey!==oldKey&&newKey){cfg.value.groupReplaceRules[newKey]=cfg.value.groupReplaceRules[oldKey];delete cfg.value.groupReplaceRules[oldKey];cfg.value.groupReplaceRules={...cfg.value.groupReplaceRules}}}
@@ -540,7 +540,7 @@
    function updateLiteSortItem(i,v){if(cfg.value.liteSortTypes)cfg.value.liteSortTypes[i]=v}
    function addLiteCat(){if(newLiteCat.value.trim()){if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(newLiteCat.value.trim());newLiteCat.value=''}}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
-     http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
+     http(api.base+http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
    function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0){http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});http(api.base+'/blacklist').then(function(b){blackList.value=b||[]})};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
 
    function triggerImport(){document.getElementById('importFile').click()}
@@ -587,14 +587,14 @@
    // 定时刷新测速进度
    setInterval(function(){if(speedtestRunning.value)pollSpeedtest()},3000);
 
-   return {tab,cfg,stats,mainChannels,localChannels,corrections,whiteList,blackList,health,origin,saving,loadingStats,
-     speedtestRunning,speedtestProgress,speedtestLastResult,showCorrectionImport,correctionImportText,
+   return {tab,cfg,stats,mainChannels,localChannels,whiteList,blackList,health,origin,saving,loadingStats,
+     speedtestRunning,speedtestProgress,speedtestLastResult,
      newDelGroup,newBlockKey,newDelChar,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
      showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortText,
      menuTitle,statsOrder,
      isEmpty,copy,loadStats,updateSortGroup,
      addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,
-     addCorrection,renameCorrection,importCorrections,doImportCorrections,saveCorrectionsOnly,
+     addCorrection,
      addGroupRule,renameGroupRule,addNameRule,renameNameRule,
      addDelGroup,addBlockKey,addDelChar,addRemoval,addUrlRule,renameUrlRule,
      addWhiteListItem,removeWhite,addBlackListItem,removeBlack,
