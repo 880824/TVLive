@@ -169,14 +169,7 @@
            <div v-if="Object.keys(stats||{}).length===0" style="color:var(--text3);font-size:12px;padding:8px 0;">点击刷新加载统计数据</div>
          </div>
        </div>
-
-       
-      
-        </div>
-      </div>
-      
-      </div>
-<div class="panel">
+      <div class="panel">
         <div class="panel-header">
           <span>精简版分类设置</span>
           <span style="font-size:11px;color:var(--text3)">拖拽排序</span>
@@ -193,29 +186,33 @@
             <input class="form-input" v-model="newLiteCat" placeholder="新增精简分类" style="flex:1;max-width:200px;font-size:12px;padding:4px 8px">
             <button class="btn btn-outline btn-sm" @click="addLiteCat">+ 添加</button>
           </div>
-        </div><div class="panel">
-         <div class="panel-header">配置管理</div>
-         <div class="panel-body flex flex-wrap gap-2">
-           <button class="btn btn-primary" @click="exportConfig">&#128229; 导出配置</button>
-           <button class="btn btn-outline" @click="triggerImport()">&#128228; 导入配置</button>
-           <button class="btn btn-outline" style="color:var(--danger)" @click="resetConfig">&#8634; 恢复默认</button>
-           <input type="file" id="importFile" style="display:none" accept=".json" @change="importConfig">
-         </div>
-       </div>
-     </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">配置管理</div>
+        <div class="panel-body flex flex-wrap gap-2">
+          <button class="btn btn-primary" @click="exportConfig">&#128229; 导出配置</button>
+          <button class="btn btn-outline" @click="triggerImport()">&#128228; 导入配置</button>
+          <button class="btn btn-outline" style="color:var(--danger)" @click="resetConfig">&#8634; 恢复默认</button>
+          <input type="file" id="importFile" style="display:none" accept=".json" @change="importConfig">
+        </div>
+      </div>
+    </div>
 
      <!-- ===== 订阅管理 ===== -->
      <div class="page" :class="{active:tab==='sources'}">
        <div class="page-title">订阅源管理</div>
        <div class="page-sub">管理 M3U/TXT 订阅源地址、EPG 配置与健康状态</div>
 
-             <div style="      <div class="panel">
+      <div class="panel">
         <div class="panel-header">EPG 节目单</div>
         <div class="panel-body">
           <div class="url-row"><span class="url-label">EPG 地址</span><input class="form-input" v-model="cfg.epgUrl" style="flex:1;font-family:monospace;font-size:12px"></div>
         </div>
       </div>
-display:flex;gap:14px;flex-wrap:wrap">
+
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
         <div class="panel" style="flex:1;min-width:280px">
           <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between">
             <span>Logo 设置</span>
@@ -234,7 +231,8 @@ display:flex;gap:14px;flex-wrap:wrap">
             <input class="form-input" v-model="cfg.userAgent" placeholder="Mozilla/5.0 ..." style="font-family:monospace;font-size:12px">
           </div>
         </div>
-      
+      </div>
+
       <div class="panel">
         <div class="panel-header">
           <span>订阅源列表</span>
@@ -254,25 +252,8 @@ display:flex;gap:14px;flex-wrap:wrap">
             </tr>
           </tbody></table>
         </div>
-      </div></div>
-         </div>
-         <div class="panel-body" style="padding:0">
-           <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th style="max-width:80px;width:auto">名称</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:30px"></th></tr></thead>
-           <tbody ref="m3uTableRef">
-             <tr v-for="(s,i) in cfg.m3uList" :key="s.__id||i" :data-idx="i">
-               <td style="cursor:grab;color:var(--text3);text-align:center;width:30px">&#9776;</td>
-               <td style="text-align:center"><div class="switch" :class="{on:s.enabled}" @click="s.enabled=!s.enabled"></div></td>
-               <td><input class="form-input" v-model="s.name" style="width:100%;padding:3px 6px;font-size:12px"></td>
-               <td><input class="form-input" v-model="s.url" style="width:100%;font-family:monospace;font-size:11px;padding:3px 6px"></td>
-               <td><input class="form-input" v-model="s.ua" style="width:100%;font-size:11px;padding:3px 6px"></td>
-               <td style="text-align:center"><div class="switch" :class="{on:s.uaToUrl}" @click="s.uaToUrl=!s.uaToUrl"></div></td>
-               <td><span v-if="health[s.name]" class="badge" :class="health[s.name].ok?'badge-succ':'badge-danger'"><span class="status-dot" :class="health[s.name].ok?'on':'off'"></span>{{health[s.name].ok?'在线':'异常'}}</span><span v-else class="badge badge-info">未知</span></td>
-               <td style="text-align:center"><button class="del-btn" @click="cfg.m3uList.splice(i,1)">&times;</button></td>
-             </tr>
-           </tbody></table>
-         </div>
-       </div>
-     </div>
+      </div>
+    </div>
 
      <!-- ===== 频道分类 ===== -->
      <div class="page" :class="{active:tab==='categories'}">

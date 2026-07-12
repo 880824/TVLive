@@ -111,9 +111,8 @@ npm run dev     # 监听模式，修改自动重建
 
 ```
 TvLive/
-├── build.mjs             # esbuild 打包脚本
-├── package.json
-├── wrangler.toml         # Cloudflare 配置（参考用）
+├── package.json          # 构建命令内联于 scripts.build（esbuild CLI）
+├── wrangler.toml         # Workers 模式配置（Pages 部署可忽略/删除）
 ├── .gitignore
 ├── README.md
 ├── src/
@@ -134,6 +133,6 @@ TvLive/
 - **存储**: Cloudflare KV（绑定名 `TVLIVE`，后台手动配置）
 - **密码管理**: 环境变量 `PASSWORD`（后台手动设置）
 - **前端**: Vue 3 + SortableJS + Tailwind CSS (CDN)
-- **构建**: esbuild (ESM bundler)
+- **构建**: esbuild (ESM bundler，构建命令内联于 package.json 的 `scripts.build`)
 - **输出**: M3U / TXT 双格式
 - **测速**: HTTP HEAD 分片自调用
