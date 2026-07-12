@@ -1,0 +1,22 @@
+ name = "tv-live"
+ main = "src/index.js"
+ compatibility_date = "2025-01-01"
+ compatibility_flags = ["nodejs_compat"]
+ 
+ # Cloudflare KV 命名空间（请在 Cloudflare 后台手动创建并绑定，名称必须为 TVLIVE）
+ [[kv_namespaces]]
+ binding = "TVLIVE"
+ id = ""
+ preview_id = ""
+ 
+ # Cron 触发器（免费计划上限 3 个，用 2 个留 1 个余量）
+ [triggers]
+ crons = [
+   "0 2 */3 * *",
+   "0 20 * * *"
+ ]
+ 
+ [vars]
+ SITE_NAME = "IPTV Live"
+ 
+ [env.production]

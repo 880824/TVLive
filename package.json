@@ -1,0 +1,13 @@
+ {
+   "name": "tv-live",
+   "version": "2.0.0",
+   "description": "IPTV 直播源聚合管理系统 - Cloudflare Workers",
+   "main": "src/index.js",
+   "scripts": {
+     "build": "node build.mjs",
+     "dev": "node build.mjs --watch"
+   },
+   "devDependencies": {
+     "esbuild": "^0.20.0"
+   }
+ }
