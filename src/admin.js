@@ -509,8 +509,6 @@
  var api={base:'/config/api'};
  function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.style.display='block';setTimeout(function(){el.style.display='none'},3000)}
  function http(url,opts){return fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json'},...opts}).then(function(r){return r.json()})}
-
- try{
    try{var app=Vue.createApp({setup(){
    var tab=Vue.ref('overview');
    var cfg=Vue.ref({m3uList:[],deleteGroups:[],channelBlockKeywords:[],deleteChars:[],removalList:[],groupReplaceRules:{},nameReplaceRules:{},urlReplaceRules:{},epgUrl:'',enableEpg:true,logoTemplate:'',enableLogo:true,enableMultiSource:true,singleChannelMaxCount:5,responseTimeThreshold:2000,speedtestInterval:3,userAgent:'',fetchTimeout:10,liteSortTypes:[]});
@@ -634,6 +632,7 @@
  </body>
  </html>`;
  }
+
 
 
 
