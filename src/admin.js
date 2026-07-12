@@ -170,7 +170,29 @@
          </div>
        </div>
 
-       <div class="panel">
+       
+      
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>精简版分类设置</span>
+          <span style="font-size:11px;color:var(--text3)">拖拽排序</span>
+        </div>
+        <div class="panel-body">
+          <div class="tag-grid" ref="liteSortGridRef">
+            <div v-for="(item,i) in (liteSortList||[])" :key="i" class="tag-item" :data-idx="i">
+              <span style="cursor:grab;color:var(--text3)">&#9776;</span>
+              <input class="tag-input" :value="item" @change="updateLiteSortItem(i,$event.target.value)" style="width:100%">
+              <span class="tag-count">{{0}}</span>
+            </div>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+            <input class="form-input" v-model="newLiteCat" placeholder="新增精简分类" style="flex:1;max-width:200px;font-size:12px;padding:4px 8px">
+            <button class="btn btn-outline btn-sm" @click="addLiteCat">+ 添加</button>
+          </div>
+        </div>
+      </div><div class="panel">
          <div class="panel-header">配置管理</div>
          <div class="panel-body flex flex-wrap gap-2">
            <button class="btn btn-primary" @click="exportConfig">&#128229; 导出配置</button>
@@ -190,25 +212,7 @@
          <div class="panel-header">
            <span>EPG 与多路线设置</span>
    
-       <div class="panel">
-         <div class="panel-header">
-           <span>精简版分类设置</span>
-           <span style="font-size:11px;color:var(--text3)">拖拽排序</span>
-         </div>
-         <div class="panel-body">
-           <div class="tag-grid" ref="liteSortGridRef">
-             <div v-for="(item,i) in (cfg.liteSortTypes||[])" :key="i" class="tag-item" :data-idx="i">
-               <span style="cursor:grab;color:var(--text3)">&#9776;</span>
-               <input class="tag-input" :value="item" @change="updateLiteSortItem(i,$event.target.value)" style="width:100%">
-               <span class="tag-count">{{0}}</span>
              </div>
-           </div>
-           <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-             <input class="form-input" v-model="newLiteCat" placeholder="新增精简分类" style="flex:1;max-width:200px;font-size:12px;padding:4px 8px">
-             <button class="btn btn-outline btn-sm" @click="addLiteCat">+ 添加</button>
-           </div>
-         </div>
-       </div>      </div>
          <div class="panel-body">
            <div class="url-row"><span class="url-label">EPG 地址</span><input class="form-input" v-model="cfg.epgUrl" style="flex:1;font-family:monospace;font-size:12px;"></div>
            <div class="flex gap-4 mt-2">
@@ -219,20 +223,26 @@
          </div>
        </div>
 
-              <div class="panel">
-         <div class="panel-header">Logo 设置</div>
-         <div class="panel-body">
-           <div class="form-group"><label class="form-label">Logo 地址模板</label><input class="form-input" v-model="cfg.logoTemplate" placeholder="https://example.com/logo/{}.png" style="font-family:monospace;font-size:12px"></div>
-           <div class="flex items-center gap-3"><label class="flex items-center gap-2" style="font-size:12px;color:var(--text2)">启用 Logo <div class="switch" :class="{on:cfg.enableLogo}" @click="cfg.enableLogo=!cfg.enableLogo"></div></label></div>
-         </div>
-       </div>
-       <div class="panel">
-         <div class="panel-header">User-Agent</div>
-         <div class="panel-body">
-           <div class="form-group"><label class="form-label">默认 User-Agent（拉取订阅源时使用）</label><input class="form-input" v-model="cfg.userAgent" style="font-family:monospace;font-size:12px"></div>
-           <div class="form-group"><label class="form-label">远程源拉取超时（秒）</label><input class="form-input" type="number" v-model.number="cfg.fetchTimeout" style="width:100px"></div>
-         </div>
-       </div>
+              <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <div class="panel" style="flex:1;min-width:280px">
+          <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Logo 设置</span>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px">启用 Logo <div class="switch" :class="{on:cfg.enableLogo}" @click="cfg.enableLogo=!cfg.enableLogo"></div></label>
+          </div>
+          <div class="panel-body">
+            <input class="form-input" v-model="cfg.logoTemplate" placeholder="https://example.com/logo/{}.png" style="font-family:monospace;font-size:12px">
+          </div>
+        </div>
+        <div class="panel" style="flex:1;min-width:280px">
+          <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between">
+            <span>User-Agent</span>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px">超时(秒) <input class="form-input" type="number" v-model.number="cfg.fetchTimeout" style="width:50px;padding:2px 5px;font-size:11px"></label>
+          </div>
+          <div class="panel-body">
+            <input class="form-input" v-model="cfg.userAgent" placeholder="Mozilla/5.0 ..." style="font-family:monospace;font-size:12px">
+          </div>
+        </div>
+      </div>
 <div class="panel">
          <div class="panel-header">
            <span>订阅源列表</span>
@@ -242,7 +252,7 @@
            </div>
          </div>
          <div class="panel-body" style="padding:0">
-           <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th style="max-width:150px;width:auto">名称</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:30px"></th></tr></thead>
+           <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th style="max-width:80px;width:auto">名称</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:30px"></th></tr></thead>
            <tbody ref="m3uTableRef">
              <tr v-for="(s,i) in cfg.m3uList" :key="s.__id||i" :data-idx="i">
                <td style="cursor:grab;color:var(--text3);text-align:center;width:30px">&#9776;</td>
