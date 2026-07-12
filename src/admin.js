@@ -126,9 +126,8 @@
      <button class="nav-item" :class="{active:tab==='categories'}" @click="goto('categories')"><span class="nav-icon">&#9776;</span>频道分类</button>
      <button class="nav-item" :class="{active:tab==='mapping'}" @click="goto('mapping')"><span class="nav-icon">&#8596;</span>规则映射</button>
      <button class="nav-item" :class="{active:tab==='filter'}" @click="goto('filter')"><span class="nav-icon">&#128683;</span>屏蔽过滤</button>
-     <button class="nav-item" :class="{active:tab==='blacklist'}" @click="goto('blacklist')"><span class="nav-icon">&#128308;</span>黑白名单</button>
-     <button class="nav-item" :class="{active:tab==='speedtest'}" @click="goto('speedtest')"><span class="nav-icon">&#9889;</span>测速中心</button>
-   </nav>
+    <button class="nav-item" :class="{active:tab==='blacklist'}" @click="goto('blacklist')"><span class="nav-icon">&#128308;</span>黑白名单</button>
+  </nav>
    <div class="sidebar-footer">
      <button class="save-btn" @click="saveAll" :disabled="saving">{{saving?'保存中...':'保存全部配置'}}</button>
    </div>
@@ -234,11 +233,30 @@
       </div>
 
       <div class="panel">
-        <div class="panel-header">
+        <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
           <span>订阅源列表</span>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button class="btn btn-outline btn-sm" @click="addM3u">+ 新增订阅</button>
+            <button class="btn btn-sm" :class="cfg.enableMultiSource?'btn-primary':'btn-outline'" @click="cfg.enableMultiSource=!cfg.enableMultiSource">{{cfg.enableMultiSource?'多路线:开':'多路线:关'}}</button>
+            <button class="btn btn-primary btn-sm" @click="startSpeedtest" :disabled="speedtestRunning">{{speedtestRunning?'测速中...':'&#9889; 一键测速'}}</button>
+            <label class="flex items-center gap-1" style="font-size:12px;color:var(--text2)">响应阈值 <input class="form-input" type="number" v-model.number="cfg.responseTimeThreshold" style="width:64px;padding:2px 5px;font-size:11px"> ms</label>
+            <label class="flex items-center gap-1" style="font-size:12px;color:var(--text2)">自动测速 <input class="form-input" type="number" v-model.number="cfg.speedtestInterval" style="width:46px;padding:2px 5px;font-size:11px"> 天</label>
+          </div>
+        </div>
+        <div class="panel-body" style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.08)">
+          <div v-if="speedtestRunning">
+            <div class="flex justify-between" style="font-size:12px;color:var(--text2)">
+              <span>进度：{{speedtestProgress.completed}}/{{speedtestProgress.total}}</span>
+              <span>通过：<span style="color:var(--success)">{{speedtestProgress.passed}}</span> / 失败：<span style="color:var(--danger)">{{speedtestProgress.failed}}</span></span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" :style="{width:speedtestProgress.progress+'%'}"></div></div>
+          </div>
+          <div v-if="speedtestLastResult" style="font-size:12px;color:var(--text2)">
+            上次测速：{{speedtestLastResult.time}} | 通过 {{speedtestLastResult.passed}} / 失败 {{speedtestLastResult.failed}}
+          </div>
         </div>
         <div class="panel-body" style="padding:0">
-          <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th style="max-width:100px;width:auto">名称</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:30px"></th></tr></thead>
+          <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th class="col-ua">名称</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:90px">响应时间</th><th style="width:90px">HTTP状态</th><th style="width:30px"></th></tr></thead>
           <tbody ref="m3uTableRef">
             <tr v-for="(s,i) in cfg.m3uList" :key="s.__id||i" :data-idx="i">
               <td style="cursor:grab;color:var(--text3);text-align:center;width:30px">&#9776;</td>
@@ -248,6 +266,8 @@
               <td><input class="form-input" v-model="s.ua" style="width:100%;font-size:11px;padding:3px 6px"></td>
               <td style="text-align:center"><div class="switch" :class="{on:s.uaToUrl}" @click="s.uaToUrl=!s.uaToUrl"></div></td>
               <td><span v-if="health[s.name]" class="badge" :class="health[s.name].ok?'badge-succ':'badge-danger'"><span class="status-dot" :class="health[s.name].ok?'on':'off'"></span>{{health[s.name].ok?'在线':'异常'}}</span><span v-else class="badge badge-info">未知</span></td>
+              <td style="font-size:11px;color:var(--text3);text-align:center">{{health[s.name]?health[s.name].time+'ms':'—'}}</td>
+              <td style="font-size:11px;color:var(--text3);text-align:center">{{health[s.name]?health[s.name].status:'—'}}</td>
               <td style="text-align:center"><button class="del-btn" @click="cfg.m3uList.splice(i,1)">&times;</button></td>
             </tr>
           </tbody></table>
@@ -421,45 +441,6 @@
        </div>
      </div>
 
-     <!-- ===== 测速中心 ===== -->
-     <div class="page" :class="{active:tab==='speedtest'}">
-       <div class="page-title">测速中心</div>
-       <div class="page-sub">手动一键测速、自动测速配置，检测直播源的可达性和响应时间</div>
-       <div class="panel">
-         <div class="panel-header">测速控制</div>
-         <div class="panel-body">
-           <div class="flex gap-3 items-center flex-wrap">
-             <button class="btn btn-primary" @click="startSpeedtest" :disabled="speedtestRunning">
-               {{speedtestRunning?'测速进行中...':'&#9889; 一键测速'}}
-             </button>
-             <label class="flex items-center gap-2" style="font-size:12px;color:var(--text2)">
-               响应阈值 <input class="form-input" type="number" v-model.number="cfg.responseTimeThreshold" style="width:70px;padding:3px 6px;font-size:12px"> ms
-             </label>
-             <label class="flex items-center gap-2" style="font-size:12px;color:var(--text2)">
-               自动测速间隔 <input class="form-input" type="number" v-model.number="cfg.speedtestInterval" style="width:50px;padding:3px 6px;font-size:12px"> 天
-             </label>
-           </div>
-           <div v-if="speedtestRunning" class="mt-2">
-             <div class="flex justify-between" style="font-size:12px;color:var(--text2)">
-               <span>进度：{{speedtestProgress.completed}}/{{speedtestProgress.total}}</span>
-               <span>通过：<span style="color:var(--success)">{{speedtestProgress.passed}}</span> / 失败：<span style="color:var(--danger)">{{speedtestProgress.failed}}</span></span>
-             </div>
-             <div class="progress-bar"><div class="progress-fill" :style="{width:speedtestProgress.progress+'%'}"></div></div>
-           </div>
-           <div v-if="speedtestLastResult" class="mt-2" style="font-size:12px;color:var(--text2)">
-             上次测速：{{speedtestLastResult.time}} | 通过 {{speedtestLastResult.passed}} / 失败 {{speedtestLastResult.failed}}
-           </div>
-         </div>
-       </div>
-       <div class="panel">
-         <div class="panel-header">源健康状态</div>
-         <div class="panel-body" style="padding:0">
-           <table><thead><tr><th>源名称</th><th>状态</th><th>响应时间</th><th>HTTP 状态</th></tr></thead>
-           <tbody><tr v-for="(h,name) in health" :key="name"><td>{{name}}</td><td><span class="badge" :class="h.ok?'badge-succ':'badge-danger'"><span class="status-dot" :class="h.ok?'on':'off'"></span>{{h.ok?'在线':'异常'}}</span></td><td>{{h.time}}ms</td><td>{{h.status}}</td></tr></tbody></table>
-         </div>
-       </div>
-     </div>
-
         </div>
  </div>
  </div>
@@ -482,7 +463,7 @@
    var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);
    var liteSortText=Vue.ref('');var newLiteCat=Vue.ref('');
 
-   var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单','speedtest':'测速中心'};return t[tab.value]||''});
+   var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单'};return t[tab.value]||''});
    
    var liteSortGridRef=Vue.ref(null);var liteSortList=Vue.computed(function(){return cfg.value.liteSortTypes||[]});var liteSortCounts=Vue.computed(function(){var o={};var s=stats.value||{};for(var k in s)o[k]=s[k];return o});var statsOrder=Vue.computed(function(){var o=cfg.value.sortOrder||[];var s=stats.value;var r=[];for(var g of o){r.push({group:g,count:s[g]||0})}var used=new Set(o);for(var g in s){if(!used.has(g))r.push({group:g,count:s[g]})}return r});
 
