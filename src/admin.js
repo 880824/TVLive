@@ -33,8 +33,8 @@
  <head>
  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
  <title>IPTV Manager - 直播源聚合管理系统</title>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"></script>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+ <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
  <style>
  :root{--accent:#00D4AA;--accent-bg:rgba(0,212,170,.12);--accent-border:rgba(0,212,170,.22);--sidebar-bg:#141414;--content-bg:#1A1A1A;--card-bg:#222;--card-border:#2A2A2A;--text:#EDEDED;--text2:#999;--text3:#666;--success:#00D4AA;--danger:#FF4D4F;--warning:#FAAD14;--radius:10px;--shadow:0 1px 2px rgba(0,0,0,.2)}
  *{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;display:flex;height:100vh;background:var(--content-bg);color:var(--text);font-size:14px;overflow:hidden}
@@ -511,7 +511,7 @@
  function http(url,opts){return fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json'},...opts}).then(function(r){return r.json()})}
 
  try{
-   try{var app=Vue.createApp({setup(){
+   var app=Vue.createApp({setup(){
    var tab=Vue.ref('overview');
    var cfg=Vue.ref({m3uList:[],deleteGroups:[],channelBlockKeywords:[],deleteChars:[],removalList:[],groupReplaceRules:{},nameReplaceRules:{},urlReplaceRules:{},epgUrl:'',enableEpg:true,logoTemplate:'',enableLogo:true,enableMultiSource:true,singleChannelMaxCount:5,responseTimeThreshold:2000,speedtestInterval:3,userAgent:'',fetchTimeout:10,liteSortTypes:[]});
    var stats=Vue.ref({});var mainChannels=Vue.ref([]);var localChannels=Vue.ref([]);var corrections=Vue.ref({});
@@ -634,6 +634,8 @@
  </body>
  </html>`;
  }
+
+
 
 
 
