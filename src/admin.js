@@ -159,17 +159,23 @@
          </div>
          <div class="panel-body">
            <div class="tag-grid" ref="sortGridRef">
-             <div v-for="(item,i) in statsOrder" :key="item.group||i" class="tag-item" :data-idx="i">
-               <span style="cursor:grab;color:var(--text3)">&#9776;</span>
-               <input class="tag-input" :value="item.group" @change="updateSortGroup(i,$event.target.value)">
-               <span class="tag-count">{{item.count||0}}</span>
+             <div v-for="(g,i) in (cfg.sortOrder||[])" :key="g" class="tag-item" :data-idx="i" :data-group="g">
+               <span class="grab" style="cursor:grab;color:var(--text3)">&#9776;</span>
+               <input class="tag-input" :value="g" @change="updateSortGroup(i,$event.target.value)">
+               <span class="tag-count">{{stats[g]||0}}</span>
+             </div>
+             <div v-for="g in extraGroups" :key="'x'+g" class="tag-item locked" :data-group="g">
+               <span style="cursor:not-allowed;color:var(--text3)">&#9776;</span>
+               <input class="tag-input" :value="g" readonly>
+               <span class="tag-count">{{stats[g]||0}}</span>
+             </div>
+             <div class="tag-item tag-add" style="cursor:default;border-style:dashed">
+               <input class="tag-input" v-model="newGroupName" placeholder="新增频道组" @keyup.enter="addSortGroup" @input="groupAddError=''">
+               <button class="btn btn-outline btn-xs" @click="addSortGroup">+ 添加</button>
              </div>
            </div>
            <div v-if="Object.keys(stats||{}).length===0" style="color:var(--text3);font-size:12px;padding:8px 0;">点击刷新加载统计数据</div>
-           <div style="margin-top:8px"><div class="tag-item" style="cursor:default;border-style:dashed">
-             <input class="tag-input" v-model="newGroupName" placeholder="新增频道组" @keyup.enter="addSortGroup">
-             <button class="btn btn-outline btn-xs" @click="addSortGroup">+ 添加</button>
-           </div></div>
+           <div v-if="groupAddError" style="color:var(--danger);font-size:12px;margin-top:6px">{{groupAddError}}</div>
          </div>
        </div>
       <div class="panel">
@@ -179,16 +185,17 @@
         </div>
         <div class="panel-body">
           <div class="tag-grid" ref="liteSortGridRef">
-            <div v-for="(item,i) in (liteSortList||[])" :key="i" class="tag-item" :data-idx="i">
-              <span style="cursor:grab;color:var(--text3)">&#9776;</span>
+            <div v-for="(item,i) in (liteSortList||[])" :key="i" class="tag-item" :data-idx="i" :data-name="item">
+              <span class="grab" style="cursor:grab;color:var(--text3)">&#9776;</span>
               <input class="tag-input" :value="item" @change="updateLiteSortItem(i,$event.target.value)">
               <span class="tag-count">{{0}}</span>
             </div>
+            <div class="tag-item tag-add" style="cursor:default;border-style:dashed">
+              <input class="tag-input" v-model="newLiteCat" placeholder="新增精简分类" @keyup.enter="addLiteCat" @input="liteAddError=''">
+              <button class="btn btn-outline btn-xs" @click="addLiteCat">+ 添加</button>
+            </div>
           </div>
-          <div style="margin-top:8px"><div class="tag-item" style="cursor:default;border-style:dashed">
-            <input class="tag-input" v-model="newLiteCat" placeholder="新增精简分类" @keyup.enter="addLiteCat">
-            <button class="btn btn-outline btn-xs" @click="addLiteCat">+ 添加</button>
-          </div></div>
+          <div v-if="liteAddError" style="color:var(--danger);font-size:12px;margin-top:6px">{{liteAddError}}</div>
         </div>
       </div>
 
@@ -464,12 +471,13 @@
    var newDelGroup=Vue.ref('');var newBlockKey=Vue.ref('');var newRemoval=Vue.ref('');
    var newUrlFrom=Vue.ref('');var newUrlTo=Vue.ref('');var newWhiteUrl=Vue.ref('');var newBlackUrl=Vue.ref('');
    var showAddWhite=Vue.ref(false);var showAddBlack=Vue.ref(false);
-   var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);var newGroupName=Vue.ref('');
+   var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);var newGroupName=Vue.ref('');var groupAddError=Vue.ref('');var liteAddError=Vue.ref('');
    var liteSortText=Vue.ref('');var newLiteCat=Vue.ref('');
 
    var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单'};return t[tab.value]||''});
    
    var liteSortGridRef=Vue.ref(null);var liteSortList=Vue.computed(function(){return cfg.value.liteSortTypes||[]});var liteSortCounts=Vue.computed(function(){var o={};var s=stats.value||{};for(var k in s)o[k]=s[k];return o});var statsOrder=Vue.computed(function(){var o=cfg.value.sortOrder||[];var s=stats.value;var r=[];for(var g of o){r.push({group:g,count:s[g]||0})}var used=new Set(o);for(var g in s){if(!used.has(g))r.push({group:g,count:s[g]})}return r});
+   var extraGroups=Vue.computed(function(){var o=cfg.value.sortOrder||[];var used2=new Set(o);var r2=[];var s2=stats.value||{};for(var g in s2){if(!used2.has(g))r2.push(g)}return r2});
 
    function isEmpty(obj){if(!obj)return true;for(var k in obj)return false;return true}
    function copy(t){navigator.clipboard.writeText(t).then(function(){toast('已复制: '+t)})}
@@ -510,8 +518,8 @@
 
    function goto(t){tab.value=t}
    function updateLiteSortItem(i,v){if(cfg.value.liteSortTypes)cfg.value.liteSortTypes[i]=v}
-   function addLiteCat(){if(newLiteCat.value.trim()){if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(newLiteCat.value.trim());newLiteCat.value=''}}
-   function addSortGroup(){var n=newGroupName.value.trim();if(!n)return;if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder.push(n);newGroupName.value=''}
+   function addLiteCat(){var n=newLiteCat.value.trim();liteAddError.value='';if(!n){liteAddError.value='名称不能为空';return}var list=cfg.value.liteSortTypes||[];for(var k=0;k<list.length;k++){if(list[k].toLowerCase()===n.toLowerCase()){liteAddError.value='已存在同名分类';return}}if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(n);newLiteCat.value=''}
+   function addSortGroup(){var n=newGroupName.value.trim();groupAddError.value='';if(!n){groupAddError.value='名称不能为空';return}var ord=cfg.value.sortOrder||[];var all=ord.concat(extraGroups.value);for(var k=0;k<all.length;k++){if(all[k].toLowerCase()===n.toLowerCase()){groupAddError.value='已存在同名分组';return}}if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder.push(n);newGroupName.value=''}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
      http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
    function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0){http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});http(api.base+'/blacklist').then(function(b){blackList.value=b||[]})};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
@@ -537,8 +545,9 @@
      ]).then(function(){saving.value=false;toast('全部配置已保存')}).catch(function(){saving.value=false;toast('保存失败，请重试')})
    }
 
-   function initSortable(){Vue.nextTick(function(){if(liteSortGridRef.value)Sortable.create(liteSortGridRef.value,{animation:150,handle:'.tag-item',onEnd:function(ev){var list=cfg.value.liteSortTypes||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value={...cfg.value}}});
-     if(sortGridRef.value)Sortable.create(sortGridRef.value,{animation:150,handle:'.tag-item',onEnd:function(ev){var list=cfg.value.sortOrder||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value.sortOrder=list;cfg.value={...cfg.value}}});
+   function initSortable(){Vue.nextTick(function(){
+     if(liteSortGridRef.value)Sortable.create(liteSortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add)',ghostClass:'.ghost',onEnd:function(){var list=[];Array.prototype.forEach.call(liteSortGridRef.value.children,function(c){if(c.classList.contains('tag-add'))return;list.push(c.getAttribute('data-name'))});cfg.value.liteSortTypes=list;cfg.value={...cfg.value}}});
+     if(sortGridRef.value)Sortable.create(sortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add):not(.locked)',ghostClass:'.ghost',onEnd:function(){var names=[];Array.prototype.forEach.call(sortGridRef.value.children,function(c){if(c.classList.contains('tag-add')||c.classList.contains('locked'))return;names.push(c.getAttribute('data-group'))});cfg.value.sortOrder=names;cfg.value={...cfg.value}});
      if(m3uTableRef.value)Sortable.create(m3uTableRef.value,{animation:150,handle:'tr',onEnd:function(ev){var list=cfg.value.m3uList||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value={...cfg.value}}});
    })}
 
@@ -563,7 +572,7 @@
    return {tab,cfg,stats,mainChannels,localChannels,whiteList,blackList,health,origin,saving,loadingStats,
      speedtestRunning,speedtestProgress,speedtestLastResult,
      newDelGroup,newBlockKey,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
-     showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortText,newGroupName,
+     showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortText,newGroupName,groupAddError,liteAddError,extraGroups,
      menuTitle,statsOrder,
      isEmpty,copy,loadStats,updateSortGroup,addSortGroup,
      addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
