@@ -511,12 +511,10 @@
    function parseChannels(cat){cat.channels=cat.channelInput.split(',').map(function(s){return s.trim()}).filter(Boolean)}
    function parseChannelsLocal(cat){cat.channels=cat.channelInput.split(',').map(function(s){return s.trim()}).filter(Boolean)}
 
-   })}
-   }
    
    
 
-   ).then(function(){toast('纠错规则已保存')})}
+   
 
    function addGroupRule(){if(!cfg.value.groupReplaceRules)cfg.value.groupReplaceRules={};cfg.value.groupReplaceRules['新分组']=[];cfg.value.groupReplaceRules={...cfg.value.groupReplaceRules}}
    function renameGroupRule(oldKey,newKey){if(newKey!==oldKey&&newKey){cfg.value.groupReplaceRules[newKey]=cfg.value.groupReplaceRules[oldKey];delete cfg.value.groupReplaceRules[oldKey];cfg.value.groupReplaceRules={...cfg.value.groupReplaceRules}}}
@@ -540,7 +538,7 @@
    function updateLiteSortItem(i,v){if(cfg.value.liteSortTypes)cfg.value.liteSortTypes[i]=v}
    function addLiteCat(){if(newLiteCat.value.trim()){if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(newLiteCat.value.trim());newLiteCat.value=''}}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
-     http(api.base+http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
+     http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
    function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0){http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});http(api.base+'/blacklist').then(function(b){blackList.value=b||[]})};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
 
    function triggerImport(){document.getElementById('importFile').click()}
