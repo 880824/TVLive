@@ -149,7 +149,7 @@
 
        <div class="panel">
          <div class="panel-header">
-           <span>频道分组统计与排序</span>
+           <span>完整频道分组统计与排序</span>
            <div class="flex items-center gap-2">
              <button class="btn btn-outline btn-sm" @click="loadStats"><span :class="{spinning:loadingStats}">&#8634;</span> 刷新</button>
              <span style="font-size:11px;color:var(--text3)">拖拽排序</span></div>
@@ -177,7 +177,7 @@
        </div>
       <div class="panel">
         <div class="panel-header">
-          <span>精简版分类设置</span>
+          <span>精简频道分组统计与排序</span>
           <span style="font-size:11px;color:var(--text3)">拖拽排序</span>
         </div>
         <div class="panel-body">
