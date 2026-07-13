@@ -6,6 +6,7 @@
 import { getConfig, saveConfig,
  getMainChannels, saveMainChannels, getLocalChannels, saveLocalChannels,
  getBlacklist, saveBlacklist, getWhitelist, saveWhitelist, resetToDefaults,
+ getListMeta, saveListMeta,
 } from './config.js';
  import { runPipeline, getStatsOnly } from './pipeline.js';
  import { startSpeedtest, processSpeedtestChunk, getSpeedtestProgress,
@@ -161,11 +162,15 @@ import { getConfig, saveConfig,
        const list = await getWhitelist(env);
        return jsonResponse(list);
      }
-     if (path === '/config/api/whitelist/save' && method === 'POST') {
-       const data = await request.json();
-       await saveWhitelist(env, data);
-       return jsonResponse({ success: true });
-     }
+    if (path === '/config/api/whitelist/save' && method === 'POST') {
+      const data = await request.json();
+      await saveWhitelist(env, data);
+      return jsonResponse({ success: true });
+    }
+    if (path === '/config/api/list-meta') {
+      const meta = await getListMeta(env);
+      return jsonResponse(meta);
+    }
  
      // ---- 测速 ----
      if (path === '/config/api/speedtest/start' && method === 'POST') {

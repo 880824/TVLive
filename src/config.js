@@ -9,9 +9,10 @@ export const KV_KEYS = {
   SETTINGS: 'settings',
   CHANNELS_MAIN: 'channels_main',
    CHANNELS_LOCAL: 'channels_local',
-   BLACKLIST: 'blacklist',
-   WHITELIST: 'whitelist',
-   SPEEDTEST_STATUS: 'speedtest_status'
+  BLACKLIST: 'blacklist',
+  WHITELIST: 'whitelist',
+  SPEEDTEST_STATUS: 'speedtest_status',
+  LIST_META: 'list_meta'
  };
  
  
@@ -111,11 +112,26 @@ export async function resetToDefaults(env) {
    return [];
  }
  
- export async function saveWhitelist(env, list) {
-   await env.TVLIVE.put(KV_KEYS.WHITELIST, JSON.stringify(list));
- }
- 
- // ===================== 测速状态 =====================
+export async function saveWhitelist(env, list) {
+  await env.TVLIVE.put(KV_KEYS.WHITELIST, JSON.stringify(list));
+}
+
+// ===================== 黑白名单生成时间 =====================
+/** 读取黑白名单最近一次生成时间 { blacklist, whitelist } */
+export async function getListMeta(env) {
+  try {
+    const data = await env.TVLIVE.get(KV_KEYS.LIST_META, { type: 'json' });
+    if (data && typeof data === 'object') return data;
+  } catch (e) { console.error('KV list meta error:', e); }
+  return {};
+}
+
+/** 保存黑白名单生成时间（仅在自动测速生成时调用） */
+export async function saveListMeta(env, meta) {
+  await env.TVLIVE.put(KV_KEYS.LIST_META, JSON.stringify(meta || {}));
+}
+
+// ===================== 测速状态 =====================
  
  export async function getSpeedtestStatus(env) {
    try {

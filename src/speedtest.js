@@ -4,10 +4,10 @@
  * 每个子请求只测 3-5 个 URL 的 HEAD，远低于限制
  */
  
- import {
-   getConfig, saveBlacklist, saveWhitelist, getBlacklist, getWhitelist,
-   saveSpeedtestStatus, getSpeedtestStatus
- } from './config.js';
+import {
+  getConfig, saveBlacklist, saveWhitelist, getBlacklist, getWhitelist,
+  saveSpeedtestStatus, getSpeedtestStatus, saveListMeta, getListMeta
+} from './config.js';
  
  const CHUNK_SIZE = 5;  // 每片 5 个 URL
  
@@ -145,10 +145,17 @@
    if (status.completed >= status.total) {
      status.running = false;
      status.endTime = Date.now();
-     // 保存最终黑白名单到 KV
-     await saveWhitelist(env, status.results.whitelist);
-     await saveBlacklist(env, status.results.blacklist);
-   }
+    // 保存最终黑白名单到 KV
+    await saveWhitelist(env, status.results.whitelist);
+    await saveBlacklist(env, status.results.blacklist);
+    // 记录黑白名单生成时间（仅自动测速生成时）
+    try {
+      const meta = await getListMeta(env);
+      const now = new Date().toLocaleString('zh-CN');
+      meta.blacklist = now; meta.whitelist = now;
+      await saveListMeta(env, meta);
+    } catch (e) { console.error('save list meta error:', e); }
+  }
  
    await saveSpeedtestStatus(env, status);
  }
@@ -212,9 +219,16 @@
    // 保存结果
    const whitelist = await getWhitelist(env);
    const blacklist = await getBlacklist(env);
-   await saveWhitelist(env, [...whitelist, ...passed]);
-   await saveBlacklist(env, [...blacklist, ...failed]);
- }
+  await saveWhitelist(env, [...whitelist, ...passed]);
+  await saveBlacklist(env, [...blacklist, ...failed]);
+  // 记录黑白名单生成时间（仅自动测速生成时）
+  try {
+    const meta = await getListMeta(env);
+    const now = new Date().toLocaleString('zh-CN');
+    meta.blacklist = now; meta.whitelist = now;
+    await saveListMeta(env, meta);
+  } catch (e) { console.error('save list meta error:', e); }
+}
  
 /** 健康检测：检查所有订阅源的可达性 */
  export async function checkSourcesHealth(config) {

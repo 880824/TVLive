@@ -137,9 +137,6 @@
    <div class="content">
      <!-- ===== 汇总概况 ===== -->
      <div class="page" :class="{active:tab==='overview'}">
-       <div class="page-title">汇总概况</div>
-       <div class="page-sub">播放列表地址、频道统计、分组排序与配置管理</div>
-
        <div class="panel">
          <div class="panel-header">播放列表地址</div>
          <div class="panel-body">
@@ -164,11 +161,11 @@
                <input class="tag-input" :value="g" @change="updateSortGroup(i,$event.target.value)">
                <span class="tag-count">{{stats[g]||0}}</span>
              </div>
-             <div v-for="g in extraGroups" :key="'x'+g" class="tag-item locked" :data-group="g">
-               <span style="cursor:not-allowed;color:var(--text3)">&#9776;</span>
-               <input class="tag-input" :value="g" readonly>
-               <span class="tag-count">{{stats[g]||0}}</span>
-             </div>
+            <div v-for="g in extraGroups" :key="'x'+g" class="tag-item" :data-group="g">
+              <span class="grab" style="cursor:grab;color:var(--text3)">&#9776;</span>
+              <input class="tag-input" :value="g" readonly>
+              <span class="tag-count">{{stats[g]||0}}</span>
+            </div>
              <div class="tag-item tag-add" style="cursor:default;border-style:dashed">
                <input class="tag-input" v-model="newGroupName" placeholder="新增频道组" @keyup.enter="addSortGroup" @input="groupAddError=''">
                <button class="btn btn-outline btn-xs" @click="addSortGroup">+ 添加</button>
@@ -212,9 +209,6 @@
 
      <!-- ===== 订阅管理 ===== -->
      <div class="page" :class="{active:tab==='sources'}">
-       <div class="page-title">订阅源管理</div>
-       <div class="page-sub">管理 M3U/TXT 订阅源地址、EPG 配置与健康状态</div>
-
       <div class="panel">
         <div class="panel-header">EPG 节目单</div>
         <div class="panel-body">
@@ -267,12 +261,13 @@
           </div>
         </div>
         <div class="panel-body" style="padding:0">
-          <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th class="col-ua">名称</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:90px">响应时间</th><th style="width:90px">HTTP状态</th><th style="width:30px"></th></tr></thead>
+          <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th class="col-ua">名称</th><th style="width:130px">测速时间</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:90px">响应时间</th><th style="width:90px">HTTP状态</th><th style="width:30px"></th></tr></thead>
           <tbody ref="m3uTableRef">
             <tr v-for="(s,i) in cfg.m3uList" :key="s.__id||i" :data-idx="i">
               <td style="cursor:grab;color:var(--text3);text-align:center;width:30px">&#9776;</td>
               <td style="text-align:center"><div class="switch" :class="{on:s.enabled}" @click="s.enabled=!s.enabled"></div></td>
               <td><input class="form-input" v-model="s.name" style="width:100%;padding:3px 6px;font-size:12px"></td>
+              <td style="font-size:11px;color:var(--text3);text-align:center;white-space:nowrap">{{speedtestLastResult?speedtestLastResult.time:'—'}}</td>
               <td><input class="form-input" v-model="s.url" style="width:100%;font-family:monospace;font-size:11px;padding:3px 6px"></td>
               <td><input class="form-input" v-model="s.ua" style="width:100%;font-size:11px;padding:3px 6px"></td>
               <td style="text-align:center"><div class="switch" :class="{on:s.uaToUrl}" @click="s.uaToUrl=!s.uaToUrl"></div></td>
@@ -288,9 +283,6 @@
 
      <!-- ===== 频道分类 ===== -->
      <div class="page" :class="{active:tab==='categories'}">
-       <div class="page-title">频道分类管理</div>
-       <div class="page-sub">管理主频道和地方台的分类结构与频道名称列表</div>
-
        <div class="panel">
          <div class="panel-header">
            <span>主频道分类 ({{mainChannels.length}} 个)</span>
@@ -328,9 +320,6 @@
 
      <!-- ===== 规则映射 ===== -->
      <div class="page" :class="{active:tab==='mapping'}">
-       <div class="page-title">规则映射</div>
-       <div class="page-sub">频道分组映射、名称标准化规则管理</div>
-
        <div class="panel">
          <div class="panel-header">
            <span>频道分组映射（原分组名 → 标准分组）</span>
@@ -377,9 +366,6 @@
 
      <!-- ===== 屏蔽过滤 ===== -->
      <div class="page" :class="{active:tab==='filter'}">
-       <div class="page-title">屏蔽过滤</div>
-       <div class="page-sub">管理分组屏蔽、关键词屏蔽、字符删除和地址替换</div>
-
        <div class="panel">
          <div class="panel-header">频道分组屏蔽 <span class="badge badge-info">{{cfg.deleteGroups.length}}</span></div>
          <div class="panel-body"><div class="tag-grid">
@@ -416,12 +402,10 @@
 
      <!-- ===== 黑白名单 ===== -->
      <div class="page" :class="{active:tab==='blacklist'}">
-       <div class="page-title">黑白名单管理</div>
-       <div class="page-sub">管理订阅源的黑白名单，聚合时白名单优先、黑名单跳过</div>
        <div class="flex gap-3" style="height:calc(100vh - 200px)">
          <div class="panel" style="flex:1;display:flex;flex-direction:column">
            <div class="panel-header">
-             <span>白名单 ({{whiteList.length}})</span>
+             <span>白名单 ({{whiteList.length}}) <span style="font-size:11px;color:var(--text3);font-weight:400">· 生成于 {{listMeta.whitelist||'—'}}</span></span>
              <button class="btn btn-outline btn-sm" @click="showAddWhite=true">+ 添加</button>
            </div>
            <div class="panel-body" style="flex:1;overflow-y:auto;padding:0">
@@ -436,7 +420,7 @@
          </div>
          <div class="panel" style="flex:1;display:flex;flex-direction:column">
            <div class="panel-header">
-             <span>黑名单 ({{blackList.length}})</span>
+             <span>黑名单 ({{blackList.length}}) <span style="font-size:11px;color:var(--text3);font-weight:400">· 生成于 {{listMeta.blacklist||'—'}}</span></span>
              <button class="btn btn-outline btn-sm" @click="showAddBlack=true">+ 添加</button>
            </div>
            <div class="panel-body" style="flex:1;overflow-y:auto;padding:0">
@@ -473,6 +457,7 @@
    var showAddWhite=Vue.ref(false);var showAddBlack=Vue.ref(false);
    var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);var newGroupName=Vue.ref('');var groupAddError=Vue.ref('');var liteAddError=Vue.ref('');
    var newLiteCat=Vue.ref('');
+   var listMeta=Vue.ref({});
 
    var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单'};return t[tab.value]||''});
    
@@ -522,7 +507,7 @@
    function addSortGroup(){var n=newGroupName.value.trim();groupAddError.value='';if(!n){groupAddError.value='名称不能为空';return}var ord=cfg.value.sortOrder||[];var all=ord.concat(extraGroups.value);for(var k=0;k<all.length;k++){if(all[k].toLowerCase()===n.toLowerCase()){groupAddError.value='已存在同名分组';return}}if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder.push(n);newGroupName.value=''}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
      http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
-   function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0){http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});http(api.base+'/blacklist').then(function(b){blackList.value=b||[]})};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
+   function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0){http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});http(api.base+'/blacklist').then(function(b){blackList.value=b||[]});http(api.base+'/list-meta').then(function(m){listMeta.value=m||{}})};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
 
    function triggerImport(){document.getElementById('importFile').click()}
    function exportConfig(){var blob=new Blob([JSON.stringify(cfg.value,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='iptv-config.json';a.click();toast('配置已导出')}
@@ -547,9 +532,13 @@
    function initSortable(){Vue.nextTick(function(){
      sortableInstances.forEach(function(s){try{s.destroy()}catch(e){}});sortableInstances=[];
      if(liteSortGridRef.value)sortableInstances.push(Sortable.create(liteSortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add)',ghostClass:'.ghost',onEnd:function(){var list=[];Array.prototype.forEach.call(liteSortGridRef.value.children,function(c){if(c.classList.contains('tag-add'))return;list.push(c.getAttribute('data-name'))});cfg.value.liteSortTypes=list;cfg.value={...cfg.value}}}));
-     if(sortGridRef.value)sortableInstances.push(Sortable.create(sortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add):not(.locked)',ghostClass:'.ghost',onEnd:function(){var names=[];Array.prototype.forEach.call(sortGridRef.value.children,function(c){if(c.classList.contains('tag-add')||c.classList.contains('locked'))return;names.push(c.getAttribute('data-group'))});cfg.value.sortOrder=names;cfg.value={...cfg.value}}}));
-     if(m3uTableRef.value)sortableInstances.push(Sortable.create(m3uTableRef.value,{animation:150,handle:'tr',onEnd:function(ev){var list=cfg.value.m3uList||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value={...cfg.value}}}));
-   })}
+     if(sortGridRef.value)sortableInstances.push(Sortable.create(sortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add)',ghostClass:'.ghost',onEnd:function(){var names=[];Array.prototype.forEach.call(sortGridRef.value.children,function(c){if(c.classList.contains('tag-add'))return;names.push(c.getAttribute('data-group'))});cfg.value.sortOrder=names;cfg.value={...cfg.value}}}));
+    if(m3uTableRef.value)sortableInstances.push(Sortable.create(m3uTableRef.value,{animation:150,handle:'tr',onEnd:function(ev){var list=cfg.value.m3uList||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value={...cfg.value}}}));
+  })}
+
+  // 列表内容变化后重新绑定拖拽，避免 Vue 重渲染导致 Sortable 监听失效
+  Vue.watch(liteDisplayList, function(){Vue.nextTick(initSortable)});
+  Vue.watch(function(){return (cfg.value.sortOrder||[]).join('|')+'||'+(extraGroups.value||[]).join('|')}, function(){Vue.nextTick(initSortable)});
 
    // 加载初始数据
    origin.value=window.location.origin;
@@ -561,8 +550,9 @@
        for(var cat of mainChannels.value){cat.channelInput=(cat.channels||[]).join(', ')}
        for(var cat of localChannels.value){cat.channelInput=(cat.channels||[]).join(', ')}
      }),
-     http(api.base+'/whitelist').then(function(r){whiteList.value=r||[]}),
-     http(api.base+'/blacklist').then(function(r){blackList.value=r||[]}),
+    http(api.base+'/whitelist').then(function(r){whiteList.value=r||[]}),
+    http(api.base+'/blacklist').then(function(r){blackList.value=r||[]}),
+    http(api.base+'/list-meta').then(function(r){listMeta.value=r||{}}),
     http(api.base+'/stats').then(function(r){stats.value=r.stats||{};health.value=r.health||{}})
   ]).then(function(){Vue.nextTick(initSortable)});
 
@@ -573,7 +563,7 @@
      speedtestRunning,speedtestProgress,speedtestLastResult,
      newDelGroup,newBlockKey,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
      showAddWhite,showAddBlack,sortGridRef,m3uTableRef,newGroupName,groupAddError,liteAddError,extraGroups,
-     menuTitle,statsOrder,liteDisplayList,
+     menuTitle,statsOrder,liteDisplayList,listMeta,
      isEmpty,copy,loadStats,updateSortGroup,addSortGroup,
      addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
      addDelGroup,addBlockKey,addRemoval,addUrlRule,renameUrlRule,
