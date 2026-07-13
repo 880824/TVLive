@@ -76,7 +76,7 @@
  .status-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
  .status-dot.on{background:var(--success)}.status-dot.off{background:var(--danger)}.status-dot.warn{background:var(--warning)}
  .tag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
- .tag-item{background:#1A1A1A;border:1px solid var(--card-border);border-radius:6px;padding:7px 10px;cursor:pointer;transition:.12s;display:flex;align-items:center;gap:6px}
+ .tag-item{background:#1A1A1A;border:1px solid var(--card-border);border-radius:6px;padding:7px 10px;cursor:pointer;transition:.12s;display:flex;align-items:center;gap:6px;user-select:none}
  .tag-item:hover{border-color:var(--accent)}
  .tag-input{border:none;background:transparent;font-size:12px;font-weight:600;color:var(--text);font-family:inherit;outline:none;padding:0;flex:1;min-width:0;border-bottom:1px dashed transparent}
  .tag-input:focus{border-bottom-color:var(--accent)}
@@ -158,12 +158,12 @@
            <div class="tag-grid" ref="sortGridRef">
              <div v-for="(g,i) in (cfg.sortOrder||[])" :key="g" class="tag-item" :data-idx="i" :data-group="g">
                <span class="grab" style="cursor:grab;color:var(--text3)">&#9776;</span>
-               <input class="tag-input" :value="g" @change="updateSortGroup(i,$event.target.value)">
+               <span class="tag-input">{{g}}</span>
                <span class="tag-count">{{stats[g]||0}}</span>
              </div>
             <div v-for="g in extraGroups" :key="'x'+g" class="tag-item" :data-group="g">
               <span class="grab" style="cursor:grab;color:var(--text3)">&#9776;</span>
-              <input class="tag-input" :value="g" readonly>
+              <span class="tag-input">{{g}}</span>
               <span class="tag-count">{{stats[g]||0}}</span>
             </div>
              <div class="tag-item tag-add" style="cursor:default;border-style:dashed">
@@ -184,7 +184,7 @@
           <div class="tag-grid" ref="liteSortGridRef">
             <div v-for="item in (liteDisplayList||[])" :key="item" class="tag-item" :data-name="item">
               <span class="grab" style="cursor:grab;color:var(--text3)">&#9776;</span>
-              <input class="tag-input" :value="item" @change="updateLiteSortItem(item,$event.target.value)">
+              <span class="tag-input">{{item}}</span>
               <span class="tag-count">{{stats[item]||0}}</span>
             </div>
             <div class="tag-item tag-add" style="cursor:default;border-style:dashed">
@@ -468,7 +468,6 @@
    function copy(t){navigator.clipboard.writeText(t).then(function(){toast('已复制: '+t)})}
 
    function loadStats(){loadingStats.value=true;http(api.base+'/stats').then(function(r){stats.value=r.stats||{};health.value=r.health||{};loadingStats.value=false;initSortable()})}
-   function updateSortGroup(i,name){if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder[i]=name}
 
    function addM3u(){if(!cfg.value.m3uList)cfg.value.m3uList=[];cfg.value.m3uList.push({name:'新源'+Date.now(),url:'',ua:'okhttp/4.12.0',enabled:true,uaToUrl:false,__id:Date.now()})}
    function checkHealth(){health.value={};http(api.base+'/health').then(function(r){health.value=r;toast('健康检测完成')})}
@@ -502,7 +501,6 @@
    function saveBlacklistOnly(){http(api.base+'/blacklist/save',{method:'POST',body:JSON.stringify(blackList.value.map(function(b){return typeof b==='string'?b:b.url}))}).then(function(){http(api.base+'/whitelist/save',{method:'POST',body:JSON.stringify(whiteList.value)}).then(function(){toast('黑白名单已保存')})})}
 
    function goto(t){tab.value=t}
-   function updateLiteSortItem(name,v){if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];var i=cfg.value.liteSortTypes.indexOf(name);if(i>=0)cfg.value.liteSortTypes[i]=v}
    function addLiteCat(){var n=newLiteCat.value.trim();liteAddError.value='';if(!n){liteAddError.value='名称不能为空';return}var list=cfg.value.liteSortTypes||[];for(var k=0;k<list.length;k++){if(list[k].toLowerCase()===n.toLowerCase()){liteAddError.value='已存在同名分类';return}}if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(n);newLiteCat.value=''}
    function addSortGroup(){var n=newGroupName.value.trim();groupAddError.value='';if(!n){groupAddError.value='名称不能为空';return}var ord=cfg.value.sortOrder||[];var all=ord.concat(extraGroups.value);for(var k=0;k<all.length;k++){if(all[k].toLowerCase()===n.toLowerCase()){groupAddError.value='已存在同名分组';return}}if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder.push(n);newGroupName.value=''}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
@@ -562,9 +560,9 @@
    return {tab,cfg,stats,mainChannels,localChannels,whiteList,blackList,health,origin,saving,loadingStats,
      speedtestRunning,speedtestProgress,speedtestLastResult,
      newDelGroup,newBlockKey,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
-     showAddWhite,showAddBlack,sortGridRef,m3uTableRef,newGroupName,groupAddError,liteAddError,extraGroups,
+     showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortGridRef,newGroupName,groupAddError,liteAddError,extraGroups,
      menuTitle,statsOrder,liteDisplayList,listMeta,
-     isEmpty,copy,loadStats,updateSortGroup,addSortGroup,
+     isEmpty,copy,loadStats,addSortGroup,
      addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
      addDelGroup,addBlockKey,addRemoval,addUrlRule,renameUrlRule,
      addWhiteListItem,removeWhite,addBlackListItem,removeBlack,
