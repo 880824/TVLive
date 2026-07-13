@@ -216,26 +216,7 @@
    await saveBlacklist(env, [...blacklist, ...failed]);
  }
  
- /** 测试单个 URL 的响应时间（管理后台手动测速用） */
- export async function testSingleUrl(url) {
-   try {
-     const start = Date.now();
-     const controller = new AbortController();
-     const id = setTimeout(() => controller.abort(), 6000);
-     const res = await fetch(url, {
-       method: 'HEAD',
-       signal: controller.signal,
-       headers: { 'User-Agent': 'Mozilla/5.0' }
-     });
-     clearTimeout(id);
-     const elapsed = Date.now() - start;
-     return { ok: res && res.ok, time: elapsed, status: res ? res.status : 0 };
-   } catch (e) {
-     return { ok: false, time: -1, status: 0, error: e.message };
-   }
- }
- 
- /** 健康检测：检查所有订阅源的可达性 */
+/** 健康检测：检查所有订阅源的可达性 */
  export async function checkSourcesHealth(config) {
    const health = {};
    const activeSources = (config.m3uList || []).filter(s => s.enabled !== false);

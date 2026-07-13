@@ -2,9 +2,9 @@
  * 聚合管道 —— 协调下载、处理、分类、渲染流程
  */
  
- import { downloadM3u, processM3uContent, processTxtContent, detectFormat, mergeAndDeduplicate, sortItems } from './processor.js';
+ import { downloadM3u, processM3uContent, processTxtContent, detectFormat, mergeAndDeduplicate } from './processor.js';
  import { classifyChannels, generateClassifiedEntries, renderAsTxt, renderAsM3u } from './classifier.js';
- import { getConfig, getCorrections, getMainChannels, getLocalChannels, getBlacklist, getWhitelist } from './config.js';
+ import { getConfig, getMainChannels, getLocalChannels, getBlacklist, getWhitelist } from './config.js';
  import { deepClone } from './utils.js';
  
  /**
@@ -12,9 +12,8 @@
   * @returns {Object} { m3u_full, txt_full, m3u_lite, txt_lite, stats, sourceHealth }
   */
  export async function runPipeline(env, { forStatsOnly = false } = {}) {
-   const config = await getConfig(env);
-   const corrections = await getCorrections(env);
-   const mainChannels = await getMainChannels(env);
+  const config = await getConfig(env);
+  const mainChannels = await getMainChannels(env);
    const localChannels = await getLocalChannels(env);
    const blacklist = await getBlacklist(env);
    const whitelist = await getWhitelist(env);
@@ -72,7 +71,7 @@
    const merged = mergeAndDeduplicate(allDownloadedItems, config);
 
    // 归类到分类体系
-   const { classified } = classifyChannels(merged, mainChannels, localChannels, corrections, config);
+   const { classified } = classifyChannels(merged, mainChannels, localChannels, config);
 
    // 生成完整版（含地方台）
    const fullResult = generateClassifiedEntries(classified, mainChannels, localChannels, config, true);

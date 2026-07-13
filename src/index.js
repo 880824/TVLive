@@ -3,10 +3,10 @@
  * 功能：M3U/TXT 双格式播放列表输出 + 频道分类 + 名称纠错 + 测速 + 管理后台
  */
  
- import { getConfig, saveConfig, getCorrections, saveCorrections,
-  getMainChannels, saveMainChannels, getLocalChannels, saveLocalChannels,
-  getBlacklist, saveBlacklist, getWhitelist, saveWhitelist, resetToDefaults,
- } from './config.js';
+import { getConfig, saveConfig,
+ getMainChannels, saveMainChannels, getLocalChannels, saveLocalChannels,
+ getBlacklist, saveBlacklist, getWhitelist, saveWhitelist, resetToDefaults,
+} from './config.js';
  import { runPipeline, getStatsOnly } from './pipeline.js';
  import { startSpeedtest, processSpeedtestChunk, getSpeedtestProgress,
    cronSpeedtest, checkSourcesHealth } from './speedtest.js';
@@ -134,18 +134,7 @@
        return jsonResponse(health);
      }
  
-     // ---- 纠错规则 ----
-     if (path === '/config/api/corrections') {
-       const corrections = await getCorrections(env);
-       return jsonResponse(corrections);
-     }
-     if (path === '/config/api/corrections/save' && method === 'POST') {
-       const data = await request.json();
-       await saveCorrections(env, data);
-       return jsonResponse({ success: true });
-     }
- 
-     // ---- 频道分类 ----
+    // ---- 频道分类 ----
      if (path === '/config/api/channels') {
        const main = await getMainChannels(env);
        const local = await getLocalChannels(env);

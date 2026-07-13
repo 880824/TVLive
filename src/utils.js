@@ -17,14 +17,11 @@
    removalList: [
      "「IPV4」","「IPV6」","[ipv6]","[ipv4]","_电信","电信","（HD）","[超清]","高清","超清",
      "-HD","(HK)","AKtv","@","IPV6","🎞️","🎦","[BD]","[VGA]","[HD]","[SD]",
-     "(1080p)","(720p)","(480p)","HD","｜","NewTV-","New_"
-   ],
-   deleteChars: [
-     "iHOT-","NewTV-","SiTV-","-HEVC","-50-FPS","-高码","-4K","-主力",
-     "-BPTV","-NPTV","-GPTV","-YHYX","-BST","-MCP",
-     "咪咕视频_8M1080_","[HD]","[SD]","[BD]","[geo-blocked]","[VGA]"
-   ],
-   deleteGroups: [
+    "(1080p)","(720p)","(480p)","HD","｜","NewTV-","New_",
+    "iHOT-","SiTV-","-HEVC","-50-FPS","-高码","-4K","-主力",
+    "-BPTV","-NPTV","-GPTV","-YHYX","-BST","-MCP","咪咕视频_8M1080_","[geo-blocked]"
+  ],
+  deleteGroups: [
      "4K频道","8K频道","内蒙频道","🎀冰茶公告","咪视界v4","英语体育","列表更新时间",
      "体育回看","冰茶体育","咪视界bc","car","other","國會頻道","game","萌宠","时尚","美食","颜值"
    ],
@@ -72,12 +69,14 @@
      "港澳频道":["mytv"]
    },
    nameReplaceRules: {
-    "CCTV1": ["CCTV1综合","CCTV1 综合","CCTV-1综合","CCTV-1","CCTV1HD","CCTV1高清","CCTV1综合HD","CCTV1综合高清","CCTV-1综合HD","CCTV-1综合高清","CCTV-1HD","CCTV-1高清"],
+    "CCTV1": ["CCTV1综合","CCTV1 综合","CCTV-1综合","CCTV-1","CCTV1HD","CCTV1高清","CCTV1综合HD","CCTV1综合高清","CCTV-1综合HD","CCTV-1综合高清","CCTV-1HD","CCTV-1高清","CCTV1综合频道"],
     "CCTV2": ["CCTV2财经","CCTV2 财经","CCTV-2财经","CCTV-2","CCTV2HD","CCTV2高清","CCTV2财经HD","CCTV2财经高清","CCTV-2财经HD","CCTV-2财经高清","CCTV-2HD","CCTV-2高清"],
     "CCTV3": ["CCTV3综艺","CCTV3 综艺","CCTV-3综艺","CCTV-3","CCTV3HD","CCTV3高清","CCTV3综艺HD","CCTV3综艺高清","CCTV-3综艺HD","CCTV-3综艺高清","CCTV-3HD","CCTV-3高清"],
-    "CCTV4": ["CCTV4国际","CCTV4中文国际","CCTV4 中文国际","CCTV-4","CCTV4HD","CCTV4高清","CCTV4国际HD","CCTV4国际高清","CCTV4中文国际HD","CCTV4中文国际高清","CCTV-4HD","CCTV-4高清"],
+    "CCTV4": ["CCTV4国际","CCTV4中文国际","CCTV4 中文国际","CCTV-4","CCTV4HD","CCTV4高清","CCTV4国际HD","CCTV4国际高清","CCTV4中文国际HD","CCTV4中文国际高清","CCTV-4HD","CCTV-4高清","CCTV-4中文国际"],
+    "CCTV4欧洲": ["CCTV-4 (欧洲)","CCTV4 (欧洲)"],
+    "CCTV4美洲": ["CCTV-4 (美洲)","CCTV4 (美洲)"],
     "CCTV5": ["CCTV5体育","CCTV5 体育","CCTV-5 体育","CCTV-5","CCTV5HD","CCTV5高清","CCTV5体育HD","CCTV5体育高清","CCTV-5 体育HD","CCTV-5 体育高清","CCTV-5HD","CCTV-5高清"],
-    "CCTV5+": ["CCTV5+体育","CCTV5+ 体育","CCTV-5+ 体育赛事","CCTV5+ 体育赛事","CCTV-5+","CCTV5+HD","CCTV5+高清","CCTV5+体育HD","CCTV5+体育高清","CCTV-5+ 体育赛事HD","CCTV-5+ 体育赛事高清","CCTV-5+HD","CCTV-5+高清"],
+    "CCTV5+": ["CCTV5+体育","CCTV5+ 体育","CCTV-5+ 体育赛事","CCTV5+ 体育赛事","CCTV-5+","CCTV5+HD","CCTV5+高清","CCTV5+体育HD","CCTV5+体育高清","CCTV-5+ 体育赛事HD","CCTV-5+ 体育赛事高清","CCTV-5+HD","CCTV-5+高清","CCTV5+体育赛事","CCTV5p","CCTV5P"],
     "CCTV6": ["CCTV6电影","CCTV6 电影","CCTV-6 电影","CCTV-6","CCTV6HD","CCTV6高清","CCTV6电影HD","CCTV6电影高清","CCTV-6 电影HD","CCTV-6 电影高清","CCTV-6HD","CCTV-6高清"],
     "CCTV7": ["CCTV7国防军事","CCTV7 国防军事","CCTV7国防","CCTV7军事农业","CCTV7军事","CCTV-7 国防军事","CCTV-7","CCTV7HD","CCTV7高清","CCTV7国防军事HD","CCTV7国防军事高清","CCTV7国防HD","CCTV7国防高清","CCTV7军事农业HD","CCTV7军事农业高清","CCTV7军事HD","CCTV7军事高清","CCTV-7 国防军事HD","CCTV-7 国防军事高清","CCTV-7HD","CCTV-7高清"],
     "CCTV8": ["CCTV8电视剧","CCTV8 电视剧","CCTV-8 电视剧","CCTV-8","CCTV8HD","CCTV8高清","CCTV8电视剧HD","CCTV8电视剧高清","CCTV-8 电视剧HD","CCTV-8 电视剧高清","CCTV-8HD","CCTV-8高清"],
@@ -316,7 +315,7 @@
     "南国都市4K": ["南国都市4KHD","南国都市4K高清"],
     "4K宣传": [],
     "4K测试": [],
-    "翡翠台": ["翡翠台B","无线翡翠台","香港 翡翠台","TVB翡翠台","TVB 翡翠台","翡翠台TVBJ1","翡翠台1","翡翠台 MY","翡翠台 P","翡翠台 CANTONESE SUBTITLES"],
+    "翡翠台": ["翡翠台B","无线翡翠台","香港 翡翠台","TVB翡翠台","TVB 翡翠台","翡翠台TVBJ1","翡翠台1","翡翠台 MY","翡翠台 P","翡翠台 CANTONESE SUBTITLES","翡翠台HD","翡翠台高清"],
     "翡翠台4K": ["翡翠台 4K"],
     "华丽翡翠台": ["翡翠台华丽台","TVB华丽翡翠台","TVB 华丽翡翠台粵","华丽 翡翠台"],
     "黄金翡翠台": ["MYTV黄金翡翠台","黄金翡翠台HD","黄金翡翠台高清","MYTV黄金翡翠台HD","MYTV黄金翡翠台高清"],
@@ -614,7 +613,6 @@
    ]
  };
  
- 
 // ===================== 默认频道分类与纠错规则 =====================
  export const DEFAULT_MAIN_CATEGORIES = [
   { name: "收藏频道", channels: ["电影最TOP","凤凰中文","凤凰资讯","凤凰香港","Love Nature","History 歷史頻道","History 历史频道","fun探索娛樂台","fun探索娱乐台","BBC Earth","中天新聞","中天新闻","中天新聞台","中天新闻台","TVBS新聞","TVBS新闻","TVBS新聞台","TVBS新闻台","寰宇新聞","寰宇新闻","寰宇新聞台","寰宇新闻台","寰宇新聞台灣台","寰宇新闻台湾台","東森新聞台","东森新闻台","東森財經新聞台","东森财经新闻台","三立新聞iNEWS","三立新闻iNEWS","广东体育","五星体育"] },
@@ -676,44 +674,6 @@
   { name: "新疆频道", channels: ["克拉玛依汉语综合","克拉玛依维语综合","克拉玛依影剧场","克拉玛依生活娱乐","克拉玛依新闻","哈密一套","哈密二套","哈密三套","伊犁汉语综合","伊犁维吾尔","伊犁哈萨克","伊犁经济法制","裕民汉语","裕民哈语","兵团四师可克达拉综合","兵团五师双河新闻综合","兵团七师胡杨河新闻综合","兵团八师石河子新闻综合","兵团八师石河子影视文体","兵团八师石河子经济生活","兵团八师石河子教育","兵团十三师新星综合","兵团十四师昆玉综合","奎屯哈萨克语","伊宁汉语综合","伊宁维吾尔语","昭苏哈语","昭苏汉语","霍尔果斯综合","玛纳斯综合","新疆｜卫视","新疆｜伊犁哈萨克","新疆｜伊犁汉语综合","新疆｜伊犁经济法制","新疆｜伊犁维吾尔","新疆｜兵团四师可克达拉综合","新疆｜兵团八师石河子教育","新疆｜兵团八师石河子新闻综合","新疆｜兵团八师石河子经济生活","新疆｜克拉玛依维语综合","新疆｜克拉玛依影视","新疆｜可克达拉综合","新疆｜奎屯哈萨克语","新疆｜奎屯汉语综合","新疆｜巴音郭楞州","新疆｜玛纳斯综合","新疆｜石河子影视文体","新疆｜石河子教育","新疆｜石河子新闻综合","新疆｜石河子经济生活","新疆｜裕民哈语","新疆｜裕民汉语"] },
 ]
 
- export const DEFAULT_CORRECTIONS = {
-   "CCTV1综合":"CCTV1","CCTV-1综合":"CCTV1","CCTV1 综合":"CCTV1","CCTV-1":"CCTV1","CCTV1综合频道":"CCTV1",
-   "CCTV1HD":"CCTV1","CCTV1高清":"CCTV1","CCTV1综合HD":"CCTV1","CCTV1综合高清":"CCTV1",
-   "CCTV2财经":"CCTV2","CCTV-2财经":"CCTV2","CCTV-2":"CCTV2","CCTV2HD":"CCTV2","CCTV2高清":"CCTV2","CCTV2财经HD":"CCTV2","CCTV2财经高清":"CCTV2",
-   "CCTV3综艺":"CCTV3","CCTV-3综艺":"CCTV3","CCTV-3":"CCTV3","CCTV3HD":"CCTV3","CCTV3高清":"CCTV3","CCTV3综艺HD":"CCTV3","CCTV3综艺高清":"CCTV3",
-   "CCTV4国际":"CCTV4","CCTV4中文国际":"CCTV4","CCTV-4中文国际":"CCTV4","CCTV-4":"CCTV4","CCTV4HD":"CCTV4","CCTV4高清":"CCTV4","CCTV4国际HD":"CCTV4","CCTV4国际高清":"CCTV4",
-   "CCTV4欧洲":"CCTV4欧洲","CCTV-4 (欧洲)":"CCTV4欧洲","CCTV4 (欧洲)":"CCTV4欧洲",
-   "CCTV4美洲":"CCTV4美洲","CCTV-4 (美洲)":"CCTV4美洲","CCTV4 (美洲)":"CCTV4美洲",
-   "CCTV5体育":"CCTV5","CCTV-5 体育":"CCTV5","CCTV5 体育":"CCTV5","CCTV-5":"CCTV5","CCTV5HD":"CCTV5","CCTV5高清":"CCTV5","CCTV5体育HD":"CCTV5","CCTV5体育高清":"CCTV5",
-   "CCTV5+体育":"CCTV5+","CCTV-5+ 体育赛事":"CCTV5+","CCTV5+ 体育赛事":"CCTV5+","CCTV5+体育赛事":"CCTV5+","CCTV5p":"CCTV5+","CCTV5P":"CCTV5+","CCTV-5+":"CCTV5+",
-   "CCTV6电影":"CCTV6","CCTV-6 电影":"CCTV6","CCTV6 电影":"CCTV6","CCTV-6":"CCTV6","CCTV6HD":"CCTV6","CCTV6高清":"CCTV6","CCTV6电影HD":"CCTV6","CCTV6电影高清":"CCTV6",
-   "CCTV7国防军事":"CCTV7","CCTV7国防":"CCTV7","CCTV7军事农业":"CCTV7","CCTV7军事":"CCTV7","CCTV-7 国防军事":"CCTV7","CCTV-7":"CCTV7","CCTV7HD":"CCTV7","CCTV7高清":"CCTV7","CCTV7国防军事HD":"CCTV7",
-   "CCTV8电视剧":"CCTV8","CCTV-8 电视剧":"CCTV8","CCTV8 电视剧":"CCTV8","CCTV-8":"CCTV8","CCTV8HD":"CCTV8","CCTV8高清":"CCTV8","CCTV8电视剧HD":"CCTV8","CCTV8电视剧高清":"CCTV8",
-   "CCTV9纪录":"CCTV9","CCTV9 纪录":"CCTV9","CCTV9记录":"CCTV9","CCTV-9 纪录":"CCTV9","CCTV-9":"CCTV9","CCTV9HD":"CCTV9","CCTV9高清":"CCTV9","CCTV9纪录HD":"CCTV9","CCTV9记录HD":"CCTV9",
-   "CCTV10科教":"CCTV10","CCTV-10 科教":"CCTV10","CCTV10 科教":"CCTV10","CCTV-10":"CCTV10","CCTV10HD":"CCTV10","CCTV10高清":"CCTV10","CCTV10科教HD":"CCTV10",
-   "CCTV11戏曲":"CCTV11","CCTV-11 戏曲":"CCTV11","CCTV11 戏曲":"CCTV11","CCTV-11":"CCTV11","CCTV11HD":"CCTV11","CCTV11高清":"CCTV11","CCTV11戏曲HD":"CCTV11",
-   "CCTV12法制":"CCTV12","CCTV12社会与法":"CCTV12","CCTV12 社会与法":"CCTV12","CCTV-12 社会与法":"CCTV12","CCTV-12":"CCTV12","CCTV12HD":"CCTV12","CCTV12高清":"CCTV12","CCTV12法制HD":"CCTV12","CCTV12社会与法HD":"CCTV12",
-   "CCTV13新闻":"CCTV13","CCTV-13 新闻":"CCTV13","CCTV13 新闻":"CCTV13","CCTV-13":"CCTV13","CCTV13HD":"CCTV13","CCTV13高清":"CCTV13","CCTV13新闻HD":"CCTV13",
-   "CCTV14少儿":"CCTV14","CCTV14 少儿":"CCTV14","CCTV少儿":"CCTV14","CCTV-14 少儿":"CCTV14","CCTV-14":"CCTV14","CCTV14HD":"CCTV14","CCTV14高清":"CCTV14","CCTV14少儿HD":"CCTV14","CCTV少儿HD":"CCTV14",
-   "CCTV15音乐":"CCTV15","CCTV15 音乐":"CCTV15","CCTV-15 音乐":"CCTV15","CCTV-15":"CCTV15","CCTV15HD":"CCTV15","CCTV15高清":"CCTV15","CCTV15音乐HD":"CCTV15",
-   "CCTV16奥林匹克":"CCTV16","CCTV16 奥林匹克":"CCTV16","CCTV16奥林":"CCTV16","CCTV-16":"CCTV16","CCTV16HD":"CCTV16","CCTV16高清":"CCTV16","CCTV16奥林HD":"CCTV16",
-   "CCTV17农业":"CCTV17","CCTV17农村":"CCTV17","CCTV-17 农业农村":"CCTV17","CCTV17 农业农村":"CCTV17","CCTV-17":"CCTV17","CCTV17HD":"CCTV17","CCTV17高清":"CCTV17","CCTV17农业HD":"CCTV17","CCTV17农村HD":"CCTV17",
-   "CCTV4K":"CCTV4K","CCTV8K":"CCTV8K",
-   "中国教育":"CETV1","中教一台":"CETV1","CETV1HD":"CETV1","CETV1高清":"CETV1",
-   "中教二台":"CETV2","CETV2HD":"CETV2","CETV2高清":"CETV2",
-   "湖南卫视HD":"湖南卫视","湖南卫视高清":"湖南卫视",
-   "浙江卫视HD":"浙江卫视","浙江卫视高清":"浙江卫视",
-   "江苏卫视HD":"江苏卫视","江苏卫视高清":"江苏卫视",
-   "东方卫视HD":"东方卫视","东方卫视高清":"东方卫视","上海卫视":"东方卫视","上海卫视HD":"东方卫视","上海卫视高清":"东方卫视",
-   "深圳卫视HD":"深圳卫视","深圳卫视高清":"深圳卫视",
-   "北京卫视HD":"北京卫视","北京卫视高清":"北京卫视",
-   "翡翠台B":"翡翠台","无线翡翠台":"翡翠台","香港 翡翠台":"翡翠台","TVB翡翠台":"翡翠台","TVB 翡翠台":"翡翠台",
-   "翡翠台HD":"翡翠台","翡翠台高清":"翡翠台",
-   "明珠台":"明珠台","TVB明珠台":"明珠台","TVB 明珠台":"明珠台","无线明珠台":"明珠台",
-   "凤凰中文":"凤凰中文","凤凰卫视":"凤凰中文",
-   "凤凰资讯":"凤凰资讯","凤凰香港":"凤凰香港","星空卫视":"星空卫视"
- };
-
 // ===================== 通用工具函数 =====================
  
  /** 安全 UTF-8 文本解码 */
@@ -729,16 +689,8 @@
    } catch { return new TextDecoder('gbk', { fatal: false }).decode(data); }
  }
  
- /** 安全 URL 编码（只编码必要字符） */
- export function safeQuoteUrl(url) {
-   try {
-     const unquoted = decodeURIComponent(url);
-     return encodeURI(unquoted);
-   } catch { return url; }
- }
- 
- /** 提取 M3U 频道名 */
- export function parseExtInfName(extInfLine) {
+/** 提取 M3U 频道名 */
+export function parseExtInfName(extInfLine) {
    const match = extInfLine.match(/,([^,]+)$/);
    return match ? match[1].trim() : '';
  }
@@ -774,17 +726,66 @@
    }
  }
  
- /** 清洁频道名：移除 REMOVAL_LIST 中的字符串 */
- export function cleanChannelName(name, removalList) {
-   if (!name) return '';
-   name = name.replace(/\u3000/g, ' ').replace(/[\u200b-\u200f]/g, '').replace(/ /g, '');
-   for (const item of removalList || []) {
-     name = name.replace(new RegExp(item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
-   }
-   name = name.replace(/CCTV-?/gi, 'CCTV').replace(/CCTV0/g, 'CCTV');
-   name = name.replace(/PLUS/gi, '+').replace(/iHOT-/gi, 'iHOT');
-   return name.trim();
- }
+// ===================== 繁体 → 简体 归一化 =====================
+// 把港台等繁体频道名转成简体，提升分类字典命中率。
+// 采用字符映射表方式，避免引入 wasm / opencc 依赖，适合 Cloudflare Workers 环境。
+const TRAD_TO_SIMP = {
+  '體':'体','體育':'体育','視':'视','頻':'频','電':'电','廣':'广','東':'东','臺':'台','灣':'湾',
+  '衛':'卫','藝':'艺','線':'线','節':'节','飛':'飞','來':'来','個':'个','們':'们','這':'这',
+  '那':'那','號':'号','語':'语','話':'话','點':'点','場':'场','購':'购','團':'团','類':'类',
+  '動':'动','畫':'画','閱':'阅','覽':'览','頁':'页','網':'网','習':'习','漢':'汉','讓':'让',
+  '認':'认','識':'识','說':'说','講':'讲','讀':'读','書':'书','麼':'么','親':'亲','愛':'爱',
+  '產':'产','當':'当','選':'选','長':'长','門':'门','間':'间','問':'问','聞':'闻','閒':'闲',
+  '專':'专','與':'与','興':'兴','學':'学','樂':'乐','發':'发','車':'车','馬':'马','鳥':'鸟',
+  '魚':'鱼','見':'见','觀':'观','覺':'觉','軍':'军','農':'农','雲':'云','園':'园','圖':'图',
+  '歷':'历','歲':'岁','總':'总','結':'结','統':'统','許':'许','試':'试','詩':'诗','詞':'词',
+  '時':'时','會':'会','開':'开','關':'关','實':'实','際':'际','經':'经','濟':'济','業':'业',
+  '對':'对','監':'监','單':'单','參':'参','戲':'戏','劇':'剧','劇場':'剧场','綜':'综',
+  '綜合':'综合','資':'资','訊':'讯','財':'财','經濟':'经济','熱':'热','收':'收','頻道':'频道',
+  '紀':'纪','錄':'录','紀錄':'纪录','財經':'财经','資訊':'资讯','熱門':'热门','收視':'收视',
+  '戲劇':'戏剧','電影':'电影','綜藝':'综艺','廣告':'广告','節目':'节目','現':'现','過':'过',
+  '載':'载','氣':'气','後':'后','裡':'里','並':'并','兩':'两','製':'制','規':'规','則':'则',
+  '應':'应','處':'处','務':'务','館':'馆','勝':'胜','聚':'聚','辦':'办','狀':'状','態':'态',
+  '確':'确','遠':'远','進':'进','連':'连','運':'运','術':'术','麗':'丽','嚴':'严','寶':'宝',
+  '歡':'欢','權':'权','構':'构','創':'创','繼':'继','續':'续','縣':'县','醫':'医','療':'疗',
+  '驗':'验','環':'环','鏡':'镜','聲':'声','響':'响','顧':'顾','順':'顺','橋':'桥','鄉':'乡',
+  '鎮':'镇','鐵':'铁','輕':'轻','軌':'轨','輪':'轮','機':'机','墊':'垫','簽':'签','證':'证',
+  '護':'护','邊':'边','層':'层','樓':'楼','廳':'厅','廈':'厦','廠':'厂','廚':'厨','廁':'厕',
+  '廟':'庙','慶':'庆','營':'营','濕':'湿','溫':'温','減':'减','燈':'灯','爐':'炉','燦':'灿',
+  '爛':'烂','為':'为','為了':'为了','從':'从','給':'给','細':'细','終':'终','緒':'绪',
+  '絲':'丝','絡':'络','維':'维','綠':'绿','緣':'缘','編':'编','緩':'缓','練':'练','級':'级',
+  '紹':'绍','納':'纳','純':'纯','紙':'纸','紋':'纹','紛':'纷','約':'约','紅':'红','紗':'纱',
+  '紮':'扎','絕':'绝','績':'绩','積':'积','穩':'稳','窮':'穷','簾':'帘','織':'织','職':'职',
+  '聰':'聪','聯':'联','舉':'举','舊':'旧','艷':'艳','範':'范','蘋':'苹','藍':'蓝','虛':'虚',
+  '補':'补','訂':'订','計':'计','訓':'训','討':'讨','託':'托','記':'记','訴':'诉','設':'设',
+  '診':'诊','該':'该','詳':'详','譯':'译','變':'变','豐':'丰','貓':'猫','貝':'贝','貨':'货',
+  '販':'贩','貪':'贪','費':'费','買':'买','責':'责','貯':'贮','貼':'贴','貴':'贵','貸':'贷',
+  '賊':'贼','賓':'宾','贈':'赠','輸':'输','題':'题','頭':'头','頂':'顶','須':'须','領':'领',
+  '顯':'显','風':'风','飲':'饮','養':'养','鳴':'鸣','麥':'麦','默':'默'
+};
+
+/** 繁体转简体（字符映射，覆盖常见广播/电视术语与高频字） */
+export function traditionalToSimplified(str) {
+  if (!str) return str;
+  let out = str;
+  for (const t in TRAD_TO_SIMP) {
+    if (out.indexOf(t) !== -1) out = out.split(t).join(TRAD_TO_SIMP[t]);
+  }
+  return out;
+}
+
+/** 清洁频道名：先做繁简归一化，再移除 removalList 中的字符串 */
+export function cleanChannelName(name, removalList) {
+  if (!name) return '';
+  name = traditionalToSimplified(name);
+  name = name.replace(/\u3000/g, ' ').replace(/[\u200b-\u200f]/g, '').replace(/ /g, '');
+  for (const item of removalList || []) {
+    name = name.replace(new RegExp(item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
+  }
+  name = name.replace(/CCTV-?/gi, 'CCTV').replace(/CCTV0/g, 'CCTV');
+  name = name.replace(/PLUS/gi, '+').replace(/iHOT-/gi, 'iHOT');
+  return name.trim();
+}
  
  /** 清洁 URL：移除 $ 后面的部分 */
  export function cleanUrl(url) {
@@ -803,38 +804,13 @@
    return ua.includes('mozilla/') && (ua.includes('chrome/') || ua.includes('safari') || ua.includes('firefox') || ua.includes('edg/'));
  }
  
- /** 判断是否为 M3U 内容 */
- export function isM3uContent(text) {
-   if (!text) return false;
-   return text.trim().startsWith('#EXTM3U');
- }
- 
- /** M3U 转 TXT 行列表 */
- export function convertM3uToTxt(m3uContent) {
-   const lines = m3uContent.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-   const result = [];
-   let channelName = '';
-   for (const line of lines) {
-     if (line.startsWith('#EXTM3U')) continue;
-     if (line.startsWith('#EXTINF')) {
-       channelName = parseExtInfName(line);
-     } else if (line.startsWith('http') || line.startsWith('rtmp') || line.startsWith('p3p')) {
-       if (channelName) result.push(`${channelName},${line}`);
-     } else if (!line.includes('#genre#') && line.includes(',') && line.includes('://')) {
-       if (/^[^,]+,[^\s]+:\/\/[^\s]+$/.test(line)) result.push(line);
-     }
-   }
-   return result;
- }
- 
- /** 深拷贝 */
- export function deepClone(obj) {
-   return JSON.parse(JSON.stringify(obj));
- }
- 
- /** 检查对象是否为空 */
- export function isEmptyObject(obj) {
-   if (!obj) return true;
-   for (const k in obj) { if (Object.prototype.hasOwnProperty.call(obj, k)) return false; }
-   return true;
- }
+/** 判断是否为 M3U 内容 */
+export function isM3uContent(text) {
+  if (!text) return false;
+  return text.trim().startsWith('#EXTM3U');
+}
+
+/** 深拷贝 */
+export function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}

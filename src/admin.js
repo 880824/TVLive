@@ -185,10 +185,10 @@
         </div>
         <div class="panel-body">
           <div class="tag-grid" ref="liteSortGridRef">
-            <div v-for="(item,i) in (liteSortList||[])" :key="i" class="tag-item" :data-idx="i" :data-name="item">
+            <div v-for="item in (liteDisplayList||[])" :key="item" class="tag-item" :data-name="item">
               <span class="grab" style="cursor:grab;color:var(--text3)">&#9776;</span>
-              <input class="tag-input" :value="item" @change="updateLiteSortItem(i,$event.target.value)">
-              <span class="tag-count">{{0}}</span>
+              <input class="tag-input" :value="item" @change="updateLiteSortItem(item,$event.target.value)">
+              <span class="tag-count">{{stats[item]||0}}</span>
             </div>
             <div class="tag-item tag-add" style="cursor:default;border-style:dashed">
               <input class="tag-input" v-model="newLiteCat" placeholder="新增精简分类" @keyup.enter="addLiteCat" @input="liteAddError=''">
@@ -472,11 +472,11 @@
    var newUrlFrom=Vue.ref('');var newUrlTo=Vue.ref('');var newWhiteUrl=Vue.ref('');var newBlackUrl=Vue.ref('');
    var showAddWhite=Vue.ref(false);var showAddBlack=Vue.ref(false);
    var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);var newGroupName=Vue.ref('');var groupAddError=Vue.ref('');var liteAddError=Vue.ref('');
-   var liteSortText=Vue.ref('');var newLiteCat=Vue.ref('');
+   var newLiteCat=Vue.ref('');
 
    var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单'};return t[tab.value]||''});
    
-   var liteSortGridRef=Vue.ref(null);var liteSortList=Vue.computed(function(){return cfg.value.liteSortTypes||[]});var liteSortCounts=Vue.computed(function(){var o={};var s=stats.value||{};for(var k in s)o[k]=s[k];return o});var statsOrder=Vue.computed(function(){var o=cfg.value.sortOrder||[];var s=stats.value;var r=[];for(var g of o){r.push({group:g,count:s[g]||0})}var used=new Set(o);for(var g in s){if(!used.has(g))r.push({group:g,count:s[g]})}return r});
+   var liteSortGridRef=Vue.ref(null);var liteDisplayList=Vue.computed(function(){var real=(mainChannels.value||[]).map(function(c){return c.name}).concat(['其他频道']);var pref=cfg.value.liteSortTypes||[];var set=new Set(pref);var rest=real.filter(function(c){return !set.has(c)});return pref.concat(rest)});var liteSortCounts=Vue.computed(function(){var o={};var s=stats.value||{};for(var k in s)o[k]=s[k];return o});var statsOrder=Vue.computed(function(){var o=cfg.value.sortOrder||[];var s=stats.value;var r=[];for(var g of o){r.push({group:g,count:s[g]||0})}var used=new Set(o);for(var g in s){if(!used.has(g))r.push({group:g,count:s[g]})}return r});
    var extraGroups=Vue.computed(function(){var o=cfg.value.sortOrder||[];var used2=new Set(o);var r2=[];var s2=stats.value||{};for(var g in s2){if(!used2.has(g))r2.push(g)}return r2});
 
    function isEmpty(obj){if(!obj)return true;for(var k in obj)return false;return true}
@@ -517,7 +517,7 @@
    function saveBlacklistOnly(){http(api.base+'/blacklist/save',{method:'POST',body:JSON.stringify(blackList.value.map(function(b){return typeof b==='string'?b:b.url}))}).then(function(){http(api.base+'/whitelist/save',{method:'POST',body:JSON.stringify(whiteList.value)}).then(function(){toast('黑白名单已保存')})})}
 
    function goto(t){tab.value=t}
-   function updateLiteSortItem(i,v){if(cfg.value.liteSortTypes)cfg.value.liteSortTypes[i]=v}
+   function updateLiteSortItem(name,v){if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];var i=cfg.value.liteSortTypes.indexOf(name);if(i>=0)cfg.value.liteSortTypes[i]=v}
    function addLiteCat(){var n=newLiteCat.value.trim();liteAddError.value='';if(!n){liteAddError.value='名称不能为空';return}var list=cfg.value.liteSortTypes||[];for(var k=0;k<list.length;k++){if(list[k].toLowerCase()===n.toLowerCase()){liteAddError.value='已存在同名分类';return}}if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(n);newLiteCat.value=''}
    function addSortGroup(){var n=newGroupName.value.trim();groupAddError.value='';if(!n){groupAddError.value='名称不能为空';return}var ord=cfg.value.sortOrder||[];var all=ord.concat(extraGroups.value);for(var k=0;k<all.length;k++){if(all[k].toLowerCase()===n.toLowerCase()){groupAddError.value='已存在同名分组';return}}if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder.push(n);newGroupName.value=''}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
@@ -530,8 +530,6 @@
    function resetConfig(){if(!confirm('确认恢复默认配置？\\n当前修改（含频道分类与纠错规则）将全部丢失。'))return;http(api.base+'/reset',{method:'POST'}).then(function(){toast('已恢复默认配置');location.reload()}).catch(function(){toast('恢复失败，请重试')})}
 
    function saveAll(){saving.value=true;
-     // 同步精简版分类文本
-     if(liteSortText.value)cfg.value.liteSortTypes=liteSortText.value.split('\\n').map(function(s){return s.trim()}).filter(Boolean);
      // 同步频道分类的 channelInput
      for(var cat of mainChannels.value){cat.channelInput=cat.channels.join(', ')}
      for(var cat of localChannels.value){cat.channelInput=cat.channels.join(', ')}
@@ -545,16 +543,18 @@
      ]).then(function(){saving.value=false;toast('全部配置已保存')}).catch(function(){saving.value=false;toast('保存失败，请重试')})
    }
 
+   var sortableInstances=[];
    function initSortable(){Vue.nextTick(function(){
-     if(liteSortGridRef.value)Sortable.create(liteSortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add)',ghostClass:'.ghost',onEnd:function(){var list=[];Array.prototype.forEach.call(liteSortGridRef.value.children,function(c){if(c.classList.contains('tag-add'))return;list.push(c.getAttribute('data-name'))});cfg.value.liteSortTypes=list;cfg.value={...cfg.value}}});
-     if(sortGridRef.value)Sortable.create(sortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add):not(.locked)',ghostClass:'.ghost',onEnd:function(){var names=[];Array.prototype.forEach.call(sortGridRef.value.children,function(c){if(c.classList.contains('tag-add')||c.classList.contains('locked'))return;names.push(c.getAttribute('data-group'))});cfg.value.sortOrder=names;cfg.value={...cfg.value}}});
-     if(m3uTableRef.value)Sortable.create(m3uTableRef.value,{animation:150,handle:'tr',onEnd:function(ev){var list=cfg.value.m3uList||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value={...cfg.value}}});
+     sortableInstances.forEach(function(s){try{s.destroy()}catch(e){}});sortableInstances=[];
+     if(liteSortGridRef.value)sortableInstances.push(Sortable.create(liteSortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add)',ghostClass:'.ghost',onEnd:function(){var list=[];Array.prototype.forEach.call(liteSortGridRef.value.children,function(c){if(c.classList.contains('tag-add'))return;list.push(c.getAttribute('data-name'))});cfg.value.liteSortTypes=list;cfg.value={...cfg.value}}}));
+     if(sortGridRef.value)sortableInstances.push(Sortable.create(sortGridRef.value,{animation:150,handle:'.grab',draggable:'.tag-item:not(.tag-add):not(.locked)',ghostClass:'.ghost',onEnd:function(){var names=[];Array.prototype.forEach.call(sortGridRef.value.children,function(c){if(c.classList.contains('tag-add')||c.classList.contains('locked'))return;names.push(c.getAttribute('data-group'))});cfg.value.sortOrder=names;cfg.value={...cfg.value}}}));
+     if(m3uTableRef.value)sortableInstances.push(Sortable.create(m3uTableRef.value,{animation:150,handle:'tr',onEnd:function(ev){var list=cfg.value.m3uList||[];var item=list.splice(ev.oldIndex,1)[0];list.splice(ev.newIndex,0,item);cfg.value={...cfg.value}}}));
    })}
 
    // 加载初始数据
    origin.value=window.location.origin;
    Promise.all([
-     http(api.base+'/get').then(function(r){if(r&&typeof r==='object'){r.groupReplaceRules=r.groupReplaceRules||{};r.nameReplaceRules=r.nameReplaceRules||{};r.urlReplaceRules=r.urlReplaceRules||{};r.deleteGroups=r.deleteGroups||[];r.channelBlockKeywords=r.channelBlockKeywords||[];r.removalList=r.removalList||[];if(r.deleteChars){var dc=new Set(r.removalList);r.deleteChars.forEach(function(x){dc.add(x)});r.removalList=Array.from(dc);r.deleteChars=null};r.m3uList=r.m3uList||[];r.liteSortTypes=r.liteSortTypes||[]}cfg.value=r;if(cfg.value.liteSortTypes)liteSortText.value=cfg.value.liteSortTypes.join('\\n')}),
+     http(api.base+'/get').then(function(r){if(r&&typeof r==='object'){r.groupReplaceRules=r.groupReplaceRules||{};r.nameReplaceRules=r.nameReplaceRules||{};r.urlReplaceRules=r.urlReplaceRules||{};r.deleteGroups=r.deleteGroups||[];r.channelBlockKeywords=r.channelBlockKeywords||[];r.removalList=r.removalList||[];if(r.deleteChars){var dc=new Set(r.removalList);r.deleteChars.forEach(function(x){dc.add(x)});r.removalList=Array.from(dc);r.deleteChars=null};r.m3uList=r.m3uList||[];r.liteSortTypes=r.liteSortTypes||[]}cfg.value=r}),
      
      http(api.base+'/channels').then(function(r){mainChannels.value=r.main||[];localChannels.value=r.local||[];
        // 格式化 channelInput
@@ -563,8 +563,8 @@
      }),
      http(api.base+'/whitelist').then(function(r){whiteList.value=r||[]}),
      http(api.base+'/blacklist').then(function(r){blackList.value=r||[]}),
-     http(api.base+'/stats').then(function(r){stats.value=r.stats||{};health.value=r.health||{};initSortable()})
-   ]);
+    http(api.base+'/stats').then(function(r){stats.value=r.stats||{};health.value=r.health||{}})
+  ]).then(function(){Vue.nextTick(initSortable)});
 
    // 定时刷新测速进度
    setInterval(function(){if(speedtestRunning.value)pollSpeedtest()},3000);
@@ -572,8 +572,8 @@
    return {tab,cfg,stats,mainChannels,localChannels,whiteList,blackList,health,origin,saving,loadingStats,
      speedtestRunning,speedtestProgress,speedtestLastResult,
      newDelGroup,newBlockKey,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
-     showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortText,newGroupName,groupAddError,liteAddError,extraGroups,
-     menuTitle,statsOrder,
+     showAddWhite,showAddBlack,sortGridRef,m3uTableRef,newGroupName,groupAddError,liteAddError,extraGroups,
+     menuTitle,statsOrder,liteDisplayList,
      isEmpty,copy,loadStats,updateSortGroup,addSortGroup,
      addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
      addDelGroup,addBlockKey,addRemoval,addUrlRule,renameUrlRule,

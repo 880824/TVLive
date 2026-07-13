@@ -2,11 +2,11 @@
  * M3U/TXT 下载与处理管道
  */
  
- import {
-   fetchWithTimeout, decodeText, isM3uContent, convertM3uToTxt,
-   cleanChannelName, cleanUrl, parseExtInfName, parseExtInfAttributes,
-   extractGroupTitle
- } from './utils.js';
+import {
+  fetchWithTimeout, decodeText, isM3uContent,
+  cleanChannelName, cleanUrl, parseExtInfName, parseExtInfAttributes,
+  extractGroupTitle, traditionalToSimplified
+} from './utils.js';
  
  /** 下载单个订阅源 M3U/TXT 内容 */
  export async function downloadM3u(source) {
@@ -41,8 +41,8 @@
    const lines = content.split(/\r?\n/);
    const result = [];
  
-   // 构建删除字符正则
-   const allDeleteChars = [...(config.deleteChars || []), ...(config.removalList || [])];
+   // 构建删除字符正则（removalList 已合并原 deleteChars，单一键）
+  const allDeleteChars = [...(config.removalList || [])];
    const deleteRegex = allDeleteChars.length > 0
      ? new RegExp(allDeleteChars.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g')
      : null;
@@ -104,18 +104,18 @@
        let rawGroup = extractGroupTitle(currentExtInf);
        if (deleteGroups.includes(rawGroup)) { currentExtInf = null; continue; }
 
-       const rawName = parseExtInfName(currentExtInf);
-       if (blockRegex && blockRegex.test(rawName)) { currentExtInf = null; continue; }
+      const rawName = traditionalToSimplified(parseExtInfName(currentExtInf));
+      if (blockRegex && blockRegex.test(rawName)) { currentExtInf = null; continue; }
 
        // 分组映射
        let newGroup = provinceGroups.includes(rawGroup)
          ? (rawName.includes('卫视') ? '卫视频道' : '地方频道')
          : (groupLookup[rawGroup] || rawGroup || '其他频道');
 
-       // 名称清理
-       let cleanedName = rawName;
-       if (deleteRegex) cleanedName = cleanedName.replace(deleteRegex, '');
-       cleanedName = cleanedName.trim().replace(/CCTV-?/gi, 'CCTV');
+      // 名称清理（rawName 已在上方做过繁简归一化）
+      let cleanedName = rawName;
+      if (deleteRegex) cleanedName = cleanedName.replace(deleteRegex, '');
+      cleanedName = cleanedName.trim().replace(/CCTV-?/gi, 'CCTV');
        const nameKey = cleanedName.toLowerCase();
        if (nameLookup[nameKey]) cleanedName = nameLookup[nameKey];
 
@@ -135,9 +135,9 @@
        // 解析 EXTINF 属性
        const attrs = parseExtInfAttributes(currentExtInf);
        ['tvg-id', 'tvg-name'].forEach(attr => {
-         if (attrs[attr]) {
-           let val = attrs[attr];
-           if (deleteRegex) val = val.replace(deleteRegex, '');
+        if (attrs[attr]) {
+          let val = traditionalToSimplified(attrs[attr]);
+          if (deleteRegex) val = val.replace(deleteRegex, '');
            val = val.trim().replace(/CCTV-?/gi, 'CCTV');
            const vk = val.toLowerCase();
            if (nameLookup[vk]) val = nameLookup[vk];
@@ -207,14 +207,7 @@
    return 'm3u';
  }
  
- /** 处理远程 URL 源：自动检测格式 */
- export function processRemoteUrl(url, config, corrections, categoryLookup) {
-   // 此函数在 pipeline 中直接调用 downloadM3u + process
-   // 为了统一复用，逻辑在 pipeline.js 中实现
-   return { items: [], sourceName: url };
- }
- 
- /** 合并多个源的频道条目，去重 */
+/** 合并多个源的频道条目，去重 */
  export function mergeAndDeduplicate(sourceResults, config) {
    const map = new Map();
 
@@ -273,25 +266,5 @@
        });
      }
    }
-   return result;
- }
- 
- /** 按 group 和 sortOrder 排序 */
- export function sortItems(items, config) {
-   const groups = {};
-   items.forEach(item => {
-     if (!groups[item.group]) groups[item.group] = [];
-     groups[item.group].push(item);
-   });
-   let result = [];
-   (config.sortOrder || []).forEach(g => {
-     if (groups[g]) {
-       result = result.concat(groups[g].sort((a, b) => a.name.localeCompare(b.name, 'zh')));
-       delete groups[g];
-     }
-   });
-   Object.keys(groups).sort().forEach(g => {
-     result = result.concat(groups[g].sort((a, b) => a.name.localeCompare(b.name, 'zh')));
-   });
-   return result;
- }
+  return result;
+}

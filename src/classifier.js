@@ -6,24 +6,17 @@
  import { cleanChannelName } from './utils.js';
  import { buildCategoryLookup } from './config.js';
  
- /** 应用纠错规则到频道名 */
- export function applyCorrections(name, corrections) {
-   if (!name || !corrections) return name;
-   return corrections[name] || name;
- }
- 
- /**
-  * 核心分类函数
+/**
+ * 核心分类函数
   * 将频道条目按分类体系归类，未匹配的进入 "其他频道"
   *
   * @param {Array} items - 频道条目列表 [{name, url, group, ...}]
   * @param {Object} mainChannels - 主频道分类列表 [{name, channels}]
-  * @param {Object} localChannels - 地方台分类列表 [{name, channels}]
-  * @param {Object} corrections - 名称纠错规则 {别名: 标准名}
-  * @param {Object} config - 全局配置
-  * @returns {Object} { classified: {分类名: [条目]}, others: [条目], allUrlSet: Set }
-  */
- export function classifyChannels(items, mainChannels, localChannels, corrections, config) {
+ * @param {Object} localChannels - 地方台分类列表 [{name, channels}]
+ * @param {Object} config - 全局配置
+ * @returns {Object} { classified: {分类名: [条目]}, others: [条目], allUrlSet: Set }
+ */
+export function classifyChannels(items, mainChannels, localChannels, config) {
    const lookup = buildCategoryLookup(mainChannels, localChannels);
    const classified = {};
    const allUrlSet = new Set();
@@ -54,10 +47,9 @@
      // 黑名单检查
      if (blacklist.has(item.url)) continue;
 
-     // 名称清洗 + 纠错
-     let chName = cleanChannelName(item.name, removalList);
-     chName = applyCorrections(chName, corrections);
-     if (!chName) continue;
+    // 名称清洗
+    let chName = cleanChannelName(item.name, removalList);
+    if (!chName) continue;
 
      // 单频道限流
      if (!isUnlimited) {
