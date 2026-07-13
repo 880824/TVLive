@@ -64,20 +64,28 @@ import {
    };
    await saveSpeedtestStatus(env, status);
  
-   // 触发自调用处理每个分片
-   const baseUrl = new URL(request.url);
-   const selfUrl = `${baseUrl.origin}/config/api/speedtest/chunk`;
-   const threshold = config.responseTimeThreshold || 2000;
- 
-   for (let i = 0; i < chunks.length; i++) {
-     ctx.waitUntil(
-       fetch(selfUrl, {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json', 'X-Auth-Init': 'speedtest' },
-         body: JSON.stringify({ chunkIndex: i, urls: chunks[i], threshold })
-       }).catch(() => {})
-     );
-   }
+  // 触发自调用处理每个分片
+  const baseUrl = new URL(request.url);
+  const selfUrl = `${baseUrl.origin}/config/api/speedtest/chunk`;
+  const threshold = config.responseTimeThreshold || 2000;
+
+  // 自调用需要带上管理员登录 Cookie，否则会被 /config/api/* 的鉴权拦截（401），
+  // 导致分片永远不被处理、黑白名单与生成时间始终无法写入 KV。
+  const authCookie = env.PASSWORD ? `auth_token=${env.PASSWORD}` : '';
+
+  for (let i = 0; i < chunks.length; i++) {
+    ctx.waitUntil(
+      fetch(selfUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Init': 'speedtest',
+          ...(authCookie ? { 'Cookie': authCookie } : {})
+        },
+        body: JSON.stringify({ chunkIndex: i, urls: chunks[i], threshold })
+      }).catch(() => {})
+    );
+  }
  
    return {
      total,

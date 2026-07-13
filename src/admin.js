@@ -149,7 +149,7 @@
 
        <div class="panel">
          <div class="panel-header">
-           <span>完整频道分组统计与排序</span>
+           <span>完整频道分组统计与排序 <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">· 共 {{fullTotal}} 个频道</span></span>
            <div class="flex items-center gap-2">
              <button class="btn btn-outline btn-sm" @click="loadStats"><span :class="{spinning:loadingStats}">&#8634;</span> 刷新</button>
              <span style="font-size:11px;color:var(--text3)">拖拽排序</span></div>
@@ -177,7 +177,7 @@
        </div>
       <div class="panel">
         <div class="panel-header">
-          <span>精简频道分组统计与排序</span>
+          <span>精简频道分组统计与排序 <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">· 共 {{liteTotal}} 个频道</span></span>
           <span style="font-size:11px;color:var(--text3)">拖拽排序</span>
         </div>
         <div class="panel-body">
@@ -463,6 +463,9 @@
    
    var liteSortGridRef=Vue.ref(null);var liteDisplayList=Vue.computed(function(){var real=(mainChannels.value||[]).map(function(c){return c.name}).concat(['其他频道']);var pref=cfg.value.liteSortTypes||[];var set=new Set(pref);var rest=real.filter(function(c){return !set.has(c)});return pref.concat(rest)});var liteSortCounts=Vue.computed(function(){var o={};var s=stats.value||{};for(var k in s)o[k]=s[k];return o});var statsOrder=Vue.computed(function(){var o=cfg.value.sortOrder||[];var s=stats.value;var r=[];for(var g of o){r.push({group:g,count:s[g]||0})}var used=new Set(o);for(var g in s){if(!used.has(g))r.push({group:g,count:s[g]})}return r});
    var extraGroups=Vue.computed(function(){var o=cfg.value.sortOrder||[];var used2=new Set(o);var r2=[];var s2=stats.value||{};for(var g in s2){if(!used2.has(g))r2.push(g)}return r2});
+   // 频道总数：完整版 = 所有分组计数之和；精简版 = 主频道分类 + 其他频道 的计数之和
+   var fullTotal=Vue.computed(function(){var s=stats.value||{};var t=0;for(var k in s)t+=(s[k]||0);return t});
+   var liteTotal=Vue.computed(function(){var s=stats.value||{};var t=0;var list=liteDisplayList.value||[];for(var i=0;i<list.length;i++){t+=(s[list[i]]||0)}return t});
 
    function isEmpty(obj){if(!obj)return true;for(var k in obj)return false;return true}
    function copy(t){navigator.clipboard.writeText(t).then(function(){toast('已复制: '+t)})}
@@ -505,7 +508,19 @@
    function addSortGroup(){var n=newGroupName.value.trim();groupAddError.value='';if(!n){groupAddError.value='名称不能为空';return}var ord=cfg.value.sortOrder||[];var all=ord.concat(extraGroups.value);for(var k=0;k<all.length;k++){if(all[k].toLowerCase()===n.toLowerCase()){groupAddError.value='已存在同名分组';return}}if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder.push(n);newGroupName.value=''}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
      http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
-   function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){speedtestProgress.value=r;if(r.running){setTimeout(pollSpeedtest,2000)}else{speedtestRunning.value=false;speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed,failed:r.failed};if(r.passed>0||r.failed>0){http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});http(api.base+'/blacklist').then(function(b){blackList.value=b||[]});http(api.base+'/list-meta').then(function(m){listMeta.value=m||{}})};if(r.passed>0||r.failed>0)toast('测速完成：通过 '+r.passed+' / 失败 '+r.failed)}})}
+   function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){
+    // 测速记录尚未落库（KV 读延迟）时继续轮询，避免被误判为“已完成”而提前终止
+    if(r.running===false && typeof r.total==='undefined'){setTimeout(pollSpeedtest,2000);return;}
+    speedtestProgress.value=r;
+    if(r.running){setTimeout(pollSpeedtest,2000);return;}
+    speedtestRunning.value=false;
+    speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed||0,failed:r.failed||0};
+    // 无论通过/失败数量，完成后都重新拉取黑白名单与生成时间，确保界面与 KV 一致
+    http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});
+    http(api.base+'/blacklist').then(function(b){blackList.value=b||[]});
+    http(api.base+'/list-meta').then(function(m){listMeta.value=m||{}});
+    toast('测速完成：通过 '+(r.passed||0)+' / 失败 '+(r.failed||0))
+  })}
 
    function triggerImport(){document.getElementById('importFile').click()}
    function exportConfig(){var blob=new Blob([JSON.stringify(cfg.value,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='iptv-config.json';a.click();toast('配置已导出')}
@@ -557,7 +572,7 @@
    // 定时刷新测速进度
    setInterval(function(){if(speedtestRunning.value)pollSpeedtest()},3000);
 
-   return {tab,cfg,stats,mainChannels,localChannels,whiteList,blackList,health,origin,saving,loadingStats,
+   return {tab,cfg,stats,mainChannels,localChannels,whiteList,blackList,health,origin,saving,loadingStats,fullTotal,liteTotal,
      speedtestRunning,speedtestProgress,speedtestLastResult,
      newDelGroup,newBlockKey,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
      showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortGridRef,newGroupName,groupAddError,liteAddError,extraGroups,
