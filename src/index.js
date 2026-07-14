@@ -194,11 +194,28 @@ import { getConfig, saveConfig,
        const status = await getSpeedtestProgress(env);
        return jsonResponse(status);
      }
-     if (path === '/config/api/speedtest/chunk' && method === 'POST') {
-       const body = await request.json();
-       const result = await processSpeedtestChunk(body, env);
-       return jsonResponse(result);
-     }
+    if (path === '/config/api/speedtest/chunk' && method === 'POST') {
+      const body = await request.json();
+      const result = await processSpeedtestChunk(body, env);
+      // 链式触发下一片（串行化，避免并发自调用触达 Cloudflare 子请求上限）
+      if (result.nextIndex < result.chunkCount) {
+        const baseUrl = new URL(request.url);
+        const selfUrl = `${baseUrl.origin}/config/api/speedtest/chunk`;
+        const authCookie = env.PASSWORD ? `auth_token=${env.PASSWORD}` : '';
+        const fireNext = () => fetch(selfUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Auth-Init': 'speedtest',
+            ...(authCookie ? { 'Cookie': authCookie } : {})
+          },
+          body: JSON.stringify({ chunkIndex: result.nextIndex, threshold: result.threshold })
+        });
+        // 触发失败自动重试一次，确保链条不中断
+        ctx.waitUntil(fireNext().catch(() => new Promise(r => setTimeout(r, 1000)).then(() => fireNext()).catch(() => {})));
+      }
+      return jsonResponse(result);
+    }
  
      return jsonResponse({ error: 'Not found' }, 404);
    } catch (e) {

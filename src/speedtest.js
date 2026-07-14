@@ -15,8 +15,18 @@ import {
   * 开始测速（从 KV 获取待测 URL 列表，分片）
   * 返回分片列表供自调用
   */
- export async function startSpeedtest(request, env, ctx) {
-   const config = await getConfig(env);
+export async function startSpeedtest(request, env, ctx) {
+  // 防止重复/卡死的测速任务叠加：若已有进行中且未超过超时阈值，则拒绝启动
+  try {
+    const prev = await getSpeedtestStatus(env);
+    if (prev && prev.running) {
+      const runningMs = Date.now() - (prev.startTime || 0);
+      if (runningMs < 30 * 60 * 1000) {
+        return { running: true, message: '已有测速任务进行中，请等待其完成（或 30 分钟后可自动重测）' };
+      }
+    }
+  } catch (e) { /* ignore */ }
+  const config = await getConfig(env);
    const existingBlacklist = await getBlacklist(env);
    const existingWhitelist = await getWhitelist(env);
    const blacklistSet = new Set(existingBlacklist.map(u => typeof u === 'string' ? u : u.url));
@@ -44,91 +54,100 @@ import {
    // 去重
    const uniqueUrls = [...new Set(allUrls)];
 
-   // 保存测速状态
-   const total = uniqueUrls.length;
-   const chunks = [];
-   for (let i = 0; i < total; i += CHUNK_SIZE) {
-     chunks.push(uniqueUrls.slice(i, i + CHUNK_SIZE));
-   }
- 
-   const status = {
-     running: true,
-     total,
-     completed: 0,
-     passed: 0,
-     failed: 0,
-     startTime: Date.now(),
-     chunks: chunks.length,
-     currentChunk: 0,
-     results: { whitelist: [...existingWhitelist], blacklist: [...existingBlacklist] }
-   };
-   await saveSpeedtestStatus(env, status);
- 
-  // 触发自调用处理每个分片
-  const baseUrl = new URL(request.url);
-  const selfUrl = `${baseUrl.origin}/config/api/speedtest/chunk`;
+  // 保存测速状态（含分片数据，供链式自调用逐片读取）
+  const total = uniqueUrls.length;
+  const chunks = [];
+  for (let i = 0; i < total; i += CHUNK_SIZE) {
+    chunks.push(uniqueUrls.slice(i, i + CHUNK_SIZE));
+  }
   const threshold = config.responseTimeThreshold || 2000;
 
-  // 自调用需要带上管理员登录 Cookie，否则会被 /config/api/* 的鉴权拦截（401），
-  // 导致分片永远不被处理、黑白名单与生成时间始终无法写入 KV。
-  const authCookie = env.PASSWORD ? `auth_token=${env.PASSWORD}` : '';
+  const status = {
+    running: true,
+    total,
+    completed: 0,
+    passed: 0,
+    failed: 0,
+    startTime: Date.now(),
+    chunks: chunks.length,
+    chunkCount: chunks.length,
+    chunkUrls: chunks,
+    threshold,
+    currentChunk: 0,
+    results: { whitelist: [...existingWhitelist], blacklist: [...existingBlacklist] }
+  };
+  await saveSpeedtestStatus(env, status);
 
-  for (let i = 0; i < chunks.length; i++) {
-    ctx.waitUntil(
-      fetch(selfUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Auth-Init': 'speedtest',
-          ...(authCookie ? { 'Cookie': authCookie } : {})
-        },
-        body: JSON.stringify({ chunkIndex: i, urls: chunks[i], threshold })
-      }).catch(() => {})
-    );
-  }
- 
-   return {
-     total,
-     chunks: chunks.length,
-     message: `测速已启动，共 ${total} 个 URL，分为 ${chunks.length} 片处理`
-   };
+  // 链式自调用：只触发第 0 片，后续每片处理完再由 chunk 路由触发下一片。
+  // 任意时刻只有 1 个自调用在飞，彻底规避 Cloudflare 单请求子请求数量/并发上限，
+  // 避免一次性并发几十~上百个分片自调用被平台静默丢弃（表现为进度条卡在某处分片不动）。
+  const baseUrl = new URL(request.url);
+  const selfUrl = `${baseUrl.origin}/config/api/speedtest/chunk`;
+  // 自调用必须带管理员登录 Cookie，否则被 /config/api/* 鉴权拦截（401）。
+  const authCookie = env.PASSWORD ? `auth_token=${env.PASSWORD}` : '';
+  const fire0 = () => fetch(selfUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Auth-Init': 'speedtest',
+      ...(authCookie ? { 'Cookie': authCookie } : {})
+    },
+    body: JSON.stringify({ chunkIndex: 0, threshold })
+  });
+  // 触发失败自动重试一次，确保第 0 片一定启动
+  ctx.waitUntil(fire0().catch(() => new Promise(r => setTimeout(r, 1000)).then(() => fire0()).catch(() => {})));
+
+  return {
+    total,
+    chunks: chunks.length,
+    message: `测速已启动，共 ${total} 个 URL，分为 ${chunks.length} 片依次处理`
+  };
  }
  
  /**
   * 处理单个测速分片（自调用入口）
   */
- export async function processSpeedtestChunk(body, env) {
-   const { chunkIndex, urls, threshold } = body;
-   const results = { passed: [], failed: [] };
-   const thresholdMs = threshold || 2000;
- 
-   for (const url of urls) {
-     try {
-       const start = Date.now();
-       const controller = new AbortController();
-       const id = setTimeout(() => controller.abort(), 6000);
-       const res = await fetch(url, {
-         method: 'HEAD',
-         signal: controller.signal,
-         headers: { 'User-Agent': 'Mozilla/5.0' }
-       });
-       clearTimeout(id);
-       const elapsed = Date.now() - start;
+export async function processSpeedtestChunk(body, env) {
+  const { chunkIndex } = body;
+  const status = await getSpeedtestStatus(env);
+  // 任务已结束（被取消/已完成/超时重测）则跳过本片
+  if (!status || !status.running) {
+    return { chunkIndex, passed: 0, failed: 0, nextIndex: chunkIndex + 1, chunkCount: status ? status.chunkCount : 0, threshold: body.threshold };
+  }
+  // 分片 URL 从启动时保存的 chunkUrls 读取（避免一次性把所有分片塞进请求体）
+  const urls = (status.chunkUrls && status.chunkUrls[chunkIndex]) || body.urls || [];
+  const thresholdMs = body.threshold || status.threshold || 2000;
 
-       if (res && res.ok && elapsed < thresholdMs) {
-         results.passed.push({ url, time: elapsed });
-       } else {
-         results.failed.push({ url, time: elapsed, reason: !res ? 'timeout' : `status_${res.status}` });
-       }
-     } catch (e) {
-       results.failed.push({ url, time: -1, reason: 'error' });
-     }
-   }
- 
-   // 更新 KV 中的结果
-   await updateSpeedtestResults(env, results);
-   return { chunkIndex, passed: results.passed.length, failed: results.failed.length };
- }
+  const results = { passed: [], failed: [] };
+
+  for (const url of urls) {
+    try {
+      const start = Date.now();
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(url, {
+        method: 'HEAD',
+        signal: controller.signal,
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      clearTimeout(id);
+      const elapsed = Date.now() - start;
+
+      if (res && res.ok && elapsed < thresholdMs) {
+        results.passed.push({ url, time: elapsed });
+      } else {
+        results.failed.push({ url, time: elapsed, reason: !res ? 'timeout' : `status_${res.status}` });
+      }
+    } catch (e) {
+      results.failed.push({ url, time: -1, reason: 'error' });
+    }
+  }
+
+  // 更新 KV 中的结果
+  await updateSpeedtestResults(env, results);
+  const chunkCount = status.chunkCount || 0;
+  return { chunkIndex, passed: results.passed.length, failed: results.failed.length, nextIndex: chunkIndex + 1, chunkCount, threshold: thresholdMs };
+}
  
  /**
   * 更新测速进度和结果到 KV
