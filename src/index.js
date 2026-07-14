@@ -6,7 +6,7 @@
 import { getConfig, saveConfig,
  getMainChannels, saveMainChannels, getLocalChannels, saveLocalChannels,
  getBlacklist, saveBlacklist, getWhitelist, saveWhitelist, resetToDefaults,
- getListMeta, saveListMeta,
+ getListMeta, saveListMeta, appendLog, getLogs,
 } from './config.js';
  import { runPipeline, getStatsOnly } from './pipeline.js';
  import { startSpeedtest, processSpeedtestChunk, getSpeedtestProgress,
@@ -59,12 +59,13 @@ import { getConfig, saveConfig,
        await cronSpeedtest(env, ctx);
        console.log('[CRON] 自动测速完成');
      }
-     // 每天聚合刷新 cron: "0 20 * * *"
-     if (cron === '0 20 * * *') {
-       console.log('[CRON] 开始每日聚合刷新...');
-       const result = await runPipeline(env);
-       console.log(`[CRON] 聚合完成: ${result.channelCount} 频道`);
-     }
+    // 每天聚合刷新 cron: "0 20 * * *"
+    if (cron === '0 20 * * *') {
+      console.log('[CRON] 开始每日聚合刷新...');
+      const result = await runPipeline(env);
+      console.log(`[CRON] 聚合完成: ${result.channelCount} 频道`);
+      ctx.waitUntil(appendLog(env, { type: 'auto', action: '每日聚合刷新', detail: (result.channelCount || 0) + ' 频道' }, ctx).catch(() => {}));
+    }
    }
  };
  
@@ -110,17 +111,19 @@ import { getConfig, saveConfig,
        const config = await getConfig(env);
        return jsonResponse(config);
      }
-     if (path === '/config/api/save' && method === 'POST') {
-       const data = await request.json();
-       await saveConfig(env, data);
-       return jsonResponse({ success: true });
-     }
+    if (path === '/config/api/save' && method === 'POST') {
+      const data = await request.json();
+      await saveConfig(env, data);
+      ctx.waitUntil(appendLog(env, { type: 'manual', action: '保存配置' }, ctx).catch(() => {}));
+      return jsonResponse({ success: true });
+    }
 
-     // ---- 恢复默认 ----
-     if (path === '/config/api/reset' && method === 'POST') {
-       await resetToDefaults(env);
-       return jsonResponse({ success: true });
-     }
+    // ---- 恢复默认 ----
+    if (path === '/config/api/reset' && method === 'POST') {
+      await resetToDefaults(env);
+      ctx.waitUntil(appendLog(env, { type: 'manual', action: '恢复默认配置' }, ctx).catch(() => {}));
+      return jsonResponse({ success: true });
+    }
  
      // ---- 统计数据 ----
      if (path === '/config/api/stats') {
@@ -141,42 +144,52 @@ import { getConfig, saveConfig,
        const local = await getLocalChannels(env);
        return jsonResponse({ main, local });
      }
-     if (path === '/config/api/channels/save' && method === 'POST') {
-       const { main, local } = await request.json();
-       await saveMainChannels(env, main);
-       await saveLocalChannels(env, local);
-       return jsonResponse({ success: true });
-     }
+    if (path === '/config/api/channels/save' && method === 'POST') {
+      const { main, local } = await request.json();
+      await saveMainChannels(env, main);
+      await saveLocalChannels(env, local);
+      ctx.waitUntil(appendLog(env, { type: 'manual', action: '保存频道分类' }, ctx).catch(() => {}));
+      return jsonResponse({ success: true });
+    }
  
      // ---- 黑白名单 ----
      if (path === '/config/api/blacklist') {
        const list = await getBlacklist(env);
        return jsonResponse(list);
      }
-     if (path === '/config/api/blacklist/save' && method === 'POST') {
-       const data = await request.json();
-       await saveBlacklist(env, data);
-       return jsonResponse({ success: true });
-     }
-     if (path === '/config/api/whitelist') {
-       const list = await getWhitelist(env);
-       return jsonResponse(list);
-     }
-    if (path === '/config/api/whitelist/save' && method === 'POST') {
+    if (path === '/config/api/blacklist/save' && method === 'POST') {
       const data = await request.json();
-      await saveWhitelist(env, data);
+      await saveBlacklist(env, data);
+      ctx.waitUntil(appendLog(env, { type: 'manual', action: '更新黑名单' }, ctx).catch(() => {}));
       return jsonResponse({ success: true });
     }
+    if (path === '/config/api/whitelist') {
+      const list = await getWhitelist(env);
+      return jsonResponse(list);
+    }
+   if (path === '/config/api/whitelist/save' && method === 'POST') {
+     const data = await request.json();
+     await saveWhitelist(env, data);
+     ctx.waitUntil(appendLog(env, { type: 'manual', action: '更新白名单' }, ctx).catch(() => {}));
+     return jsonResponse({ success: true });
+   }
     if (path === '/config/api/list-meta') {
       const meta = await getListMeta(env);
       return jsonResponse(meta);
     }
- 
-     // ---- 测速 ----
-     if (path === '/config/api/speedtest/start' && method === 'POST') {
-       const result = await startSpeedtest(request, env, ctx);
-       return jsonResponse(result);
-     }
+
+    // ---- 操作日志 ----
+    if (path === '/config/api/logs') {
+      const logs = await getLogs(env);
+      return jsonResponse(logs);
+    }
+
+    // ---- 测速 ----
+    if (path === '/config/api/speedtest/start' && method === 'POST') {
+      const result = await startSpeedtest(request, env, ctx);
+      ctx.waitUntil(appendLog(env, { type: 'manual', action: '手动测速', detail: '启动一键测速' }, ctx).catch(() => {}));
+      return jsonResponse(result);
+    }
      if (path === '/config/api/speedtest/status') {
        const status = await getSpeedtestProgress(env);
        return jsonResponse(status);

@@ -131,6 +131,81 @@ export async function saveListMeta(env, meta) {
   await env.TVLIVE.put(KV_KEYS.LIST_META, JSON.stringify(meta || {}));
 }
 
+// ===================== 操作日志 =====================
+// 按"天"分键存储，写入时设 7 天 TTL，由 Cloudflare KV 自动过期删除，
+// 无需任何清理代码、也不占用免费计划的 Cron 额度。
+export const OP_LOG_TTL = 604800; // 7 天（秒）
+
+function opLogKey(dateStr) {
+  return 'op_log_' + dateStr;
+}
+
+function dayStr(d) {
+  d = d || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/**
+ * 写入一条操作日志。
+ * @param {object} entry { type:'auto'|'manual', action, detail, ts?, time? }
+ * @param {object} [ctx]  可选，传入则使用 ctx.waitUntil 非阻塞写入（推荐在请求处理中用）
+ */
+export async function appendLog(env, entry, ctx) {
+  const key = opLogKey(dayStr());
+  let arr = [];
+  try {
+    const existing = await env.TVLIVE.get(key, { type: 'json' });
+    if (Array.isArray(existing)) arr = existing;
+  } catch (e) { console.error('read op log error:', e); }
+
+  arr.push({
+    ts: entry.ts || new Date().toISOString(),
+    time: entry.time || new Date().toLocaleString('zh-CN'),
+    type: entry.type || 'manual',
+    action: entry.action || '',
+    detail: entry.detail || ''
+  });
+
+  // 防御性上限：单日最多保留 500 条，避免极端情况下单键无限增长
+  if (arr.length > 500) arr = arr.slice(-500);
+
+  const write = env.TVLIVE.put(key, JSON.stringify(arr), { expirationTtl: OP_LOG_TTL });
+  if (ctx && typeof ctx.waitUntil === 'function') ctx.waitUntil(write);
+  else await write;
+}
+
+/**
+ * 读取最近 7 天的操作日志：取最近 7 个日期键合并、按时间倒序、并过滤 >7 天（防御 TTL 未即时生效）。
+ */
+export async function getLogs(env) {
+  const now = Date.now();
+  const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    dates.push(dayStr(new Date(now - i * 24 * 60 * 60 * 1000)));
+  }
+  const results = await Promise.all(dates.map(function (dateStr) {
+    return env.TVLIVE.get(opLogKey(dateStr), { type: 'json' }).catch(function () { return null; });
+  }));
+
+  let all = [];
+  results.forEach(function (arr) { if (Array.isArray(arr)) all = all.concat(arr); });
+
+  all = all.filter(function (x) {
+    const t = x.ts ? new Date(x.ts).getTime() : 0;
+    return t >= cutoff;
+  });
+  all.sort(function (a, b) {
+    const ta = a.ts ? new Date(a.ts).getTime() : 0;
+    const tb = b.ts ? new Date(b.ts).getTime() : 0;
+    return tb - ta;
+  });
+  return all;
+}
+
 // ===================== 测速状态 =====================
  
  export async function getSpeedtestStatus(env) {

@@ -6,7 +6,7 @@
  
 import {
   getConfig, saveBlacklist, saveWhitelist, getBlacklist, getWhitelist,
-  saveSpeedtestStatus, getSpeedtestStatus, saveListMeta, getListMeta
+  saveSpeedtestStatus, getSpeedtestStatus, saveListMeta, getListMeta, appendLog
 } from './config.js';
  
  const CHUNK_SIZE = 5;  // 每片 5 个 URL
@@ -151,18 +151,20 @@ import {
    }
  
    if (status.completed >= status.total) {
-     status.running = false;
-     status.endTime = Date.now();
-    // 保存最终黑白名单到 KV
-    await saveWhitelist(env, status.results.whitelist);
-    await saveBlacklist(env, status.results.blacklist);
-    // 记录黑白名单生成时间（仅自动测速生成时）
-    try {
-      const meta = await getListMeta(env);
-      const now = new Date().toLocaleString('zh-CN');
-      meta.blacklist = now; meta.whitelist = now;
-      await saveListMeta(env, meta);
-    } catch (e) { console.error('save list meta error:', e); }
+    status.running = false;
+    status.endTime = Date.now();
+   // 保存最终黑白名单到 KV
+   await saveWhitelist(env, status.results.whitelist);
+   await saveBlacklist(env, status.results.blacklist);
+   // 记录黑白名单生成时间 + 最新测速时间（持久化到 list_meta，刷新后依然可见）
+   try {
+     const meta = await getListMeta(env);
+     const now = new Date().toLocaleString('zh-CN');
+     meta.blacklist = now; meta.whitelist = now; meta.lastSpeedtest = now;
+     await saveListMeta(env, meta);
+   } catch (e) { console.error('save list meta error:', e); }
+   // 记录手动测速完成日志（此处为"一键测速"分片处理路径，归属 manual）
+   try { await appendLog(env, { type: 'manual', action: '测速完成', detail: '通过 ' + status.passed + ' / 失败 ' + status.failed }); } catch (e) { console.error('log error:', e); }
   }
  
    await saveSpeedtestStatus(env, status);
@@ -228,14 +230,16 @@ import {
    const whitelist = await getWhitelist(env);
    const blacklist = await getBlacklist(env);
   await saveWhitelist(env, [...whitelist, ...passed]);
-  await saveBlacklist(env, [...blacklist, ...failed]);
-  // 记录黑白名单生成时间（仅自动测速生成时）
-  try {
-    const meta = await getListMeta(env);
-    const now = new Date().toLocaleString('zh-CN');
-    meta.blacklist = now; meta.whitelist = now;
-    await saveListMeta(env, meta);
-  } catch (e) { console.error('save list meta error:', e); }
+ await saveBlacklist(env, [...blacklist, ...failed]);
+ // 记录黑白名单生成时间 + 最新测速时间（持久化到 list_meta，刷新后依然可见）
+ try {
+   const meta = await getListMeta(env);
+   const now = new Date().toLocaleString('zh-CN');
+   meta.blacklist = now; meta.whitelist = now; meta.lastSpeedtest = now;
+   await saveListMeta(env, meta);
+ } catch (e) { console.error('save list meta error:', e); }
+ // 记录自动测速完成日志
+ try { ctx.waitUntil(appendLog(env, { type: 'auto', action: '自动测速', detail: '通过 ' + passed.length + ' / 失败 ' + failed.length }, ctx).catch(() => {})); } catch (e) { console.error('log error:', e); }
 }
  
 /** 健康检测：检查所有订阅源的可达性 */

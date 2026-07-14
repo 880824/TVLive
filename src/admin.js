@@ -127,6 +127,7 @@
      <button class="nav-item" :class="{active:tab==='mapping'}" @click="goto('mapping')"><span class="nav-icon">&#8596;</span>规则映射</button>
      <button class="nav-item" :class="{active:tab==='filter'}" @click="goto('filter')"><span class="nav-icon">&#128683;</span>屏蔽过滤</button>
     <button class="nav-item" :class="{active:tab==='blacklist'}" @click="goto('blacklist')"><span class="nav-icon">&#128308;</span>黑白名单</button>
+   <button class="nav-item" :class="{active:tab==='logs'}" @click="goto('logs')"><span class="nav-icon">&#128220;</span>操作日志</button>
   </nav>
    <div class="sidebar-footer">
      <button class="save-btn" @click="saveAll" :disabled="saving">{{saving?'保存中...':'保存全部配置'}}</button>
@@ -256,8 +257,9 @@
             </div>
             <div class="progress-bar"><div class="progress-fill" :style="{width:speedtestProgress.progress+'%'}"></div></div>
           </div>
-          <div v-if="speedtestLastResult" style="font-size:12px;color:var(--text2)">
-            上次测速：{{speedtestLastResult.time}} | 通过 {{speedtestLastResult.passed}} / 失败 {{speedtestLastResult.failed}}
+          <div style="font-size:12px;color:var(--text2)">
+            最新测速时间：<b style="color:var(--accent)">{{listMeta.lastSpeedtest||'—'}}</b>
+            <span v-if="speedtestLastResult" style="margin-left:10px;color:var(--text3)">（本次会话）通过 {{speedtestLastResult.passed}} / 失败 {{speedtestLastResult.failed}}</span>
           </div>
         </div>
         <div class="panel-body" style="padding:0">
@@ -436,6 +438,38 @@
        </div>
      </div>
 
+    <!-- ===== 操作日志 ===== -->
+    <div class="page" :class="{active:tab==='logs'}">
+      <div class="panel">
+        <div class="panel-header">
+          <span>运行时间概览</span>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-outline btn-sm" @click="loadLogs"><span :class="{spinning:loadingLogs}">&#8634;</span> 刷新</button>
+          </div>
+        </div>
+        <div class="panel-body flex flex-wrap gap-4">
+          <div style="font-size:13px">最新测速时间：<b style="color:var(--accent)">{{listMeta.lastSpeedtest||'—'}}</b></div>
+          <div style="font-size:13px">黑名单生成时间：<b style="color:var(--accent)">{{listMeta.blacklist||'—'}}</b></div>
+          <div style="font-size:13px">白名单生成时间：<b style="color:var(--accent)">{{listMeta.whitelist||'—'}}</b></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">操作日志（最近 7 天，自动清理）</div>
+        <div class="panel-body" style="padding:0">
+          <table><thead><tr><th style="width:170px">时间</th><th style="width:64px">类型</th><th style="width:130px">操作</th><th>详情</th></tr></thead>
+            <tbody>
+              <tr v-for="(l,i) in logs" :key="i">
+                <td style="font-size:11px;color:var(--text3);white-space:nowrap">{{l.time}}</td>
+                <td><span class="badge" :class="l.type==='auto'?'badge-info':'badge-succ'">{{l.type==='auto'?'自动':'手动'}}</span></td>
+                <td style="font-size:12px;font-weight:600;color:var(--text)">{{l.action}}</td>
+                <td style="font-size:11px;color:var(--text2)">{{l.detail||''}}</td>
+              </tr>
+              <tr v-if="logs.length===0"><td colspan="4" style="color:var(--text3);text-align:center;padding:20px">最近 7 天暂无操作记录</td></tr>
+            </tbody></table>
+        </div>
+      </div>
+    </div>
+
         </div>
  </div>
  </div>
@@ -458,8 +492,10 @@
    var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);var newGroupName=Vue.ref('');var groupAddError=Vue.ref('');var liteAddError=Vue.ref('');
    var newLiteCat=Vue.ref('');
    var listMeta=Vue.ref({});
+  var logs=Vue.ref([]);
+  var loadingLogs=Vue.ref(false);
 
-   var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单'};return t[tab.value]||''});
+   var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单','logs':'操作日志'};return t[tab.value]||''});
    
    var liteSortGridRef=Vue.ref(null);var liteDisplayList=Vue.computed(function(){var real=(mainChannels.value||[]).map(function(c){return c.name}).concat(['其他频道']);var pref=cfg.value.liteSortTypes||[];var set=new Set(pref);var rest=real.filter(function(c){return !set.has(c)});return pref.concat(rest)});var liteSortCounts=Vue.computed(function(){var o={};var s=stats.value||{};for(var k in s)o[k]=s[k];return o});var statsOrder=Vue.computed(function(){var o=cfg.value.sortOrder||[];var s=stats.value;var r=[];for(var g of o){r.push({group:g,count:s[g]||0})}var used=new Set(o);for(var g in s){if(!used.has(g))r.push({group:g,count:s[g]})}return r});
    var extraGroups=Vue.computed(function(){var o=cfg.value.sortOrder||[];var used2=new Set(o);var r2=[];var s2=stats.value||{};for(var g in s2){if(!used2.has(g))r2.push(g)}return r2});
@@ -503,7 +539,8 @@
    function removeBlack(i){blackList.value.splice(i,1);saveBlacklistOnly()}
    function saveBlacklistOnly(){http(api.base+'/blacklist/save',{method:'POST',body:JSON.stringify(blackList.value.map(function(b){return typeof b==='string'?b:b.url}))}).then(function(){http(api.base+'/whitelist/save',{method:'POST',body:JSON.stringify(whiteList.value)}).then(function(){toast('黑白名单已保存')})})}
 
-   function goto(t){tab.value=t}
+   function loadLogs(){loadingLogs.value=true;http(api.base+'/logs').then(function(r){logs.value=r||[];loadingLogs.value=false})}
+  function goto(t){tab.value=t;if(t==='logs')loadLogs()}
    function addLiteCat(){var n=newLiteCat.value.trim();liteAddError.value='';if(!n){liteAddError.value='名称不能为空';return}var list=cfg.value.liteSortTypes||[];for(var k=0;k<list.length;k++){if(list[k].toLowerCase()===n.toLowerCase()){liteAddError.value='已存在同名分类';return}}if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(n);newLiteCat.value=''}
    function addSortGroup(){var n=newGroupName.value.trim();groupAddError.value='';if(!n){groupAddError.value='名称不能为空';return}var ord=cfg.value.sortOrder||[];var all=ord.concat(extraGroups.value);for(var k=0;k<all.length;k++){if(all[k].toLowerCase()===n.toLowerCase()){groupAddError.value='已存在同名分组';return}}if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder.push(n);newGroupName.value=''}
    function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
@@ -566,6 +603,7 @@
     http(api.base+'/whitelist').then(function(r){whiteList.value=r||[]}),
     http(api.base+'/blacklist').then(function(r){blackList.value=r||[]}),
     http(api.base+'/list-meta').then(function(r){listMeta.value=r||{}}),
+    http(api.base+'/logs').then(function(r){logs.value=r||[]}),
     http(api.base+'/stats').then(function(r){stats.value=r.stats||{};health.value=r.health||{}})
   ]).then(function(){Vue.nextTick(initSortable)});
 
@@ -581,7 +619,8 @@
      addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
      addDelGroup,addBlockKey,addRemoval,addUrlRule,renameUrlRule,
      addWhiteListItem,removeWhite,addBlackListItem,removeBlack,
-     startSpeedtest,pollSpeedtest,exportConfig,importConfig,resetConfig,saveAll,initSortable,goto,triggerImport}
+     startSpeedtest,pollSpeedtest,exportConfig,importConfig,resetConfig,saveAll,initSortable,goto,triggerImport,
+     logs,loadLogs,loadingLogs}
  }});
  app.mount('#app');}catch(e){document.getElementById('toast').textContent='Vue error: '+e.message;document.getElementById('toast').style.display='block'}
  </script>
