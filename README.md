@@ -1,138 +1,146 @@
-# TvLive - IPTV 直播源聚合管理系统
+# TvLive - IPTV 直播源聚合管理系统（Cloudflare Pages 版）
 
-基于 Cloudflare Workers / Pages 的一站式 IPTV 直播源聚合管理平台。
+基于 **Cloudflare Pages Functions** 的 IPTV 直播源聚合管理平台。
+本版本（2026-07-17）针对 **免费账户** 重新组织了标准 Pages 目录结构，并对请求频率做了重点优化。
 
-## 功能概览
+---
+
+## 一、目录结构（标准 Pages 结构）
+
+```
+TVLive20260717/
+├── functions/                 # Pages Functions：文件即路由（标准 Pages 结构）
+│   ├── _lib/                  # 共享业务代码（以下划线开头，不会被当作路由）
+│   │   ├── handlers.js        # ★ 核心：认证 / 播放列表(双层缓存) / API 分发 / 代理
+│   │   ├── config.js          # KV 配置管理（绑定名 TVLIVE）
+│   │   ├── pipeline.js        # 聚合管道
+│   │   ├── processor.js       # M3U/TXT 下载与处理
+│   │   ├── classifier.js      # 频道分类系统
+│   │   ├── utils.js           # 工具函数 + 默认配置（含 400+ 别名映射）
+│   │   └── admin.js           # 管理后台 HTML（Vue 3）
+│   ├── index.js               # 路由 /            → 完整版 M3U
+│   ├── live.m3u.js            # 路由 /live.m3u    → 完整版 M3U
+│   ├── live.txt.js            # 路由 /live.txt    → 完整版 TXT
+│   ├── lite.m3u.js            # 路由 /lite.m3u    → 精简版 M3U
+│   ├── lite.txt.js            # 路由 /lite.txt    → 精简版 TXT
+│   ├── config.js              # 路由 /config      → 管理后台
+│   ├── config/
+│   │   ├── login.js           # 路由 /config/login
+│   │   └── api/
+│   │       └── [[path]].js    # 路由 /config/api/* → API 统一分发
+│   └── proxy/
+│       └── m3u8.js            # 路由 /proxy/m3u8  → M3U8 代理
+├── public/                    # 静态资源目录（构建输出目录，可放 favicon/robots 等）
+├── package.json               # 元数据 + 本地开发脚本（wrangler）
+├── wrangler.toml             # 本地开发配置（KV 绑定 + PASSWORD）
+├── .gitignore
+└── README.md
+```
+
+**与原版（`TVLive/`，`_worker.js` 单体）的区别：**
+
+| 维度 | 原版（Workers 单体） | 本版（Pages 标准结构） |
+|---|---|---|
+| 代码组织 | 单个 `dist/_worker.js`（esbuild 打包） | `functions/` 文件路由 + `_lib/` 共享模块 |
+| 构建 | 需 `npm run build` 生成 `_worker.js` | Cloudflare 自动打包 functions，**无需本地构建** |
+| 路由 | 代码内 `switch(pathname)` | 文件系统路由（文件名即路径） |
+| 免费账户优化 | 仅靠 CDN 1h 缓存 | CDN 1h + **KV 6h 双层缓存** |
+
+---
+
+## 二、免费账户请求频率优化（重点）
+
+免费账户的核心限制：**KV 10 万读/天、1 千写/天、出站请求/CPU 受控**。
+原版每次缓存未命中都会「重新抓取全部订阅源 + 读取 5 次 KV 配置」，高频访问极易触发上限。
+
+### 1. 播放列表双层缓存
+- **第一层 CDN 边缘缓存**（`caches.default`，1 小时）：同一边缘节点内命中即返回，零后端开销。
+- **第二层 KV 预生成缓存**（6 小时）：跨边缘节点共享。首次生成时一次性产出 4 份播放列表
+  （m3u/txt × full/lite）+ 1 份元数据（统计/健康/频道数），存入 KV。
+- **效果**：最昂贵的「聚合抓取全部订阅源」从「每次 CDN 未命中都执行」降为「每 6 小时最多一次」。
+  日常访问几乎全部命中 CDN/KV，出站请求、CPU、KV 读取次数大幅下降。
+
+### 2. 统计/健康读 KV 缓存
+- `/config/api/stats`、`/config/api/health` 直接读取上次聚合写入 KV 的元数据，
+  不再每次重新抓取全部源做聚合。
+
+### 3. 关于 Cron（重要）
+**Cloudflare Pages Functions 免费版不支持 Cron 定时触发器**（这是 Workers 独占能力）。
+因此本版**取消了 Cron 依赖**：
+- 「每日聚合刷新」改为**按需惰性生成**，由 KV 的 6h TTL 自动保证新鲜度。
+- 如需在固定时刻（如每天 04:00）刷新，可用外部免费调度器（cron-job.org、GitHub Actions 等）
+  定时 `GET https://你的域名/live.m3u` 一次，触发缓存重建即可。
+
+---
+
+## 三、部署步骤（Cloudflare Pages，推荐 Git 方式）
+
+### 1. 推送到 GitHub
+```bash
+cd TVLive20260717
+git init
+git add .
+git commit -m "TVLive Pages 标准结构 + 免费账户优化"
+git remote add origin https://github.com/你的用户名/你的仓库.git
+git push -u origin main
+```
+
+### 2. Cloudflare Dashboard 连接
+1. **Workers & Pages** → **Pages** → **创建应用程序** → **连接到 Git**
+2. 选择仓库，构建设置：
+   - **构建命令**：**留空**（Pages 自动打包 `functions/`，无需 esbuild）
+   - **构建输出目录**：`public`
+3. 点击 **保存并部署**
+
+### 3. 绑定 KV 与环境变量
+部署完成后：
+1. **设置** → **函数** → **KV 命名空间绑定**
+   - 变量名称：`TVLIVE`（必须与代码一致）
+   - 选择或新建一个 KV 命名空间
+2. **设置** → **环境变量**（生产环境）
+   - 添加 `PASSWORD`（你的管理后台密码）
+
+> 以后每次 `git push` 到 GitHub，Pages 会自动重新部署。
+
+---
+
+## 四、本地开发
+
+```bash
+npm install
+# 编辑 wrangler.toml，填入真实的 TVLIVE KV 命名空间 ID 与 PASSWORD
+npm run dev          # 等价于 wrangler pages dev public
+```
+本地访问 `http://localhost:8788`（或终端提示的端口）。
+
+---
+
+## 五、功能概览
 
 ### 播放列表输出（4 种格式）
 | 路径 | 格式 | 说明 |
 |---|---|---|
 | `/live.m3u` | M3U | 完整版（主频道 + 地方台） |
-| `/live.txt` | TXT | 完整版 Txt 格式 |
+| `/live.txt` | TXT | 完整版 |
 | `/lite.m3u` | M3U | 精简版（仅主频道） |
-| `/lite.txt` | TXT | 精简版 Txt 格式 |
+| `/lite.txt` | TXT | 精简版 |
 
-### 管理后台
-| 页面 | 功能 |
-|---|---|
-| 汇总概况 | 播放列表地址、频道分组统计与排序、配置导入导出 |
-| 订阅管理 | EPG 配置、订阅源 CRUD、多路线开关、单频道上限、健康检测 |
-| 频道分类 | 主频道 24 个分类 + 地方台 30 个分类的结构化管理 |
-| 名称纠错 | 400+ 别名→标准名映射规则管理、批量导入 |
-| 规则映射 | 分组映射、名称标准化规则 |
-| 屏蔽过滤 | 分组屏蔽、关键词屏蔽、字符删除、REMOVAL_LIST、URL 替换 |
-| 黑白名单 | 自动/手动黑白名单管理 |
-| 测速中心 | 一键手动测速、自动 Cron 测速、源健康检测 |
-| 输出设置 | Logo 模板 + 开关、EPG 开关、精简版分类范围、User-Agent 配置 |
+### 管理后台 `/config`
+汇总概况、订阅管理、频道分类、名称纠错、规则映射、屏蔽过滤、输出设置。
+登录认证使用环境变量 `PASSWORD`。
 
-### 自动任务
-| Trigger | 频率 | 说明 |
-|---|---|---|
-| 自动测速 | 每 3 天 10:00 (北京) | 检测所有订阅源可达性，自动更新黑白名单 |
-| 聚合刷新 | 每天 04:00 (北京) | 重新拉取所有订阅源，刷新缓存 |
-
-### 额外功能
-- M3U8 代理（解决 CORS 跨域限制）
-- 登录认证（环境变量 `PASSWORD`）
+### 其他
+- M3U8 代理（`/proxy/m3u8`）解决跨域
 - 配置导出/导入/恢复默认
 - 全暗黑主题 Vue 3 管理界面
 
-## 部署方式（二选一）
-
-### 方式 A：Cloudflare Pages（推荐，自动从 GitHub 部署）
-
-**步骤：**
-
-#### 1. 初始化本地项目
-```bash
-cd TvLive
-npm install
-npm run build     # 构建 dist/_worker.js
-```
-
-#### 2. 推送到 GitHub
-```bash
-git init
-git add .
-git commit -m "init"
-git remote add origin https://github.com/你的用户名/你的仓库名.git
-git push -u origin main
-```
-
-#### 3. 在 Cloudflare Pages 中连接 GitHub
-1. 打开 Cloudflare Dashboard → **Workers & Pages** → **Pages** → **创建应用程序** → **连接到 Git**
-2. 授权 GitHub，选择刚推送的仓库
-3. 设置构建设置：
-   - **构建命令**：`npm run build`
-   - **构建输出目录**：`dist`
-4. 点击 **保存并部署**
-
-#### 4. 设置 KV 绑定和环境变量
-部署完成后：
-1. 进入 Pages 项目 → **设置** → **函数** → **KV 命名空间绑定**
-   - 变量名称：`TVLIVE`
-   - 选择或创建 `TVLIVE` 命名空间
-2. 进入 Pages 项目 → **设置** → **环境变量**
-   - 添加变量：`PASSWORD`（你的管理密码）
-
-> 以后每次 `git push` 到 GitHub，Pages 会自动重新构建并部署。
-
 ---
 
-### 方式 B：Cloudflare Workers（wrangler CLI）
+## 六、技术栈
+- **运行时**：Cloudflare Pages Functions（Workers 运行时）
+- **存储**：Cloudflare KV（绑定名 `TVLIVE`）
+- **密码**：环境变量 `PASSWORD`
+- **前端**：Vue 3 + SortableJS + Tailwind CSS (CDN)
+- **输出**：M3U / TXT 双格式
 
-```bash
-npm install -g wrangler
-wrangler deploy
-```
-需先设置 `CLOUDFLARE_API_TOKEN` 环境变量，或在 Cloudflare Dashboard 中配置 API Token。
-
----
-
-## 免费计划适配说明
-
-| 约束 | 适配措施 |
-|---|---|
-| Workers 100k req/天 | 播放列表请求缓存 1h，管理操作极少 |
-| 10ms CPU 时间 | 聚合流式处理；测速分片自调用，每片只测 5 个 URL |
-| KV 100k 读/天 | 配置读取 1 次/请求，缓存后不重复读 |
-| KV 1k 写/天 | 仅管理员保存配置、测速更新黑白名单时写入 |
-| Cron 3 个上限 | 只用 2 个（测速 + 聚合），留 1 个余量 |
-
-## 本地开发
-
-```bash
-npm run dev     # 监听模式，修改自动重建
-```
-
-`dist/_worker.js` 即为部署产物。
-
-## 项目结构
-
-```
-TvLive/
-├── package.json          # 构建命令内联于 scripts.build（esbuild CLI）
-├── wrangler.toml         # Workers 模式配置（Pages 部署可忽略/删除）
-├── .gitignore
-├── README.md
-├── src/
-│   ├── index.js          # 主入口 + 路由 + API
-│   ├── config.js         # KV 配置管理（绑定名 TVLIVE）
-│   ├── processor.js      # M3U/TXT 下载与处理
-│   ├── classifier.js     # 频道分类系统
-│   ├── pipeline.js       # 聚合管道
-│   ├── speedtest.js      # 测速系统
-│   ├── admin.js          # 管理后台 HTML (Vue 3)
-│   └── utils.js          # 通用工具函数
-└── dist/                 # 构建输出（gitignore）
-    └── _worker.js        # Cloudflare Pages 自动识别
-```
-
-## 技术栈
-- **运行时**: Cloudflare Workers / Pages Functions
-- **存储**: Cloudflare KV（绑定名 `TVLIVE`，后台手动配置）
-- **密码管理**: 环境变量 `PASSWORD`（后台手动设置）
-- **前端**: Vue 3 + SortableJS + Tailwind CSS (CDN)
-- **构建**: esbuild (ESM bundler，构建命令内联于 package.json 的 `scripts.build`)
-- **输出**: M3U / TXT 双格式
-- **测速**: HTTP HEAD 分片自调用
+> 注：本版已移除 `_worker.js` 单体与 esbuild 构建步骤，完全采用 Pages 标准 `functions/` 结构。

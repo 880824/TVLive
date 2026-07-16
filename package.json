@@ -1,13 +1,14 @@
- {
-   "name": "tv-live",
-   "version": "2.0.0",
-   "description": "IPTV 直播源聚合管理系统 - Cloudflare Workers",
-   "main": "src/index.js",
+{
+  "name": "tvlive-pages",
+  "version": "3.0.0",
+  "private": true,
+  "description": "IPTV 直播源聚合管理系统 - Cloudflare Pages Functions 标准结构（免费账户优化版）",
+  "type": "module",
   "scripts": {
-    "build": "esbuild src/index.js --bundle --format=esm --target=es2022 --minify --outfile=dist/_worker.js --external:__STATIC_CONTENT_MANIFEST",
-    "dev": "esbuild src/index.js --bundle --format=esm --target=es2022 --minify --outfile=dist/_worker.js --external:__STATIC_CONTENT_MANIFEST --watch"
+    "dev": "wrangler pages dev public",
+    "deploy": "wrangler pages deploy public"
   },
-   "devDependencies": {
-     "esbuild": "^0.20.0"
-   }
- }
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

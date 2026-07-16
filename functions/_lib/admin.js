@@ -58,17 +58,21 @@
  .panel-body{padding:14px 16px}
  .btn{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:.12s;border:none;font-family:inherit;white-space:nowrap}
  .btn-primary{background:var(--accent);color:#141414}.btn-primary:hover{background:#00B894}
- .btn-outline{background:transparent;color:var(--text2);border:1px solid var(--card-border)}.btn-outline:hover{background:#1A1A1A;border-color:var(--text3);color:var(--text)}
- .btn-sm{padding:4px 10px;font-size:11px}.btn-xs{padding:3px 6px;font-size:10px;border-radius:4px}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--card-border)}.btn-outline:hover{background:#1A1A1A;border-color:var(--text3);color:var(--text)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:#E03235}
+.btn-ghost{background:transparent;border:1px dashed var(--card-border);color:var(--text2)}.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+.btn-sm{padding:4px 10px;font-size:11px}.btn-xs{padding:3px 6px;font-size:10px;border-radius:4px}
  .form-input{width:100%;padding:7px 10px;border:1px solid var(--card-border);border-radius:5px;font-size:13px;font-family:inherit;background:var(--content-bg);color:var(--text);outline:none}
- .form-input:focus{border-color:var(--accent)}.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px}
+ .form-input:focus{border-color:var(--accent)}
+.form-input-sm{padding:4px 8px;border:1px solid var(--card-border);border-radius:5px;font-size:12px;font-family:inherit;background:var(--content-bg);color:var(--text);outline:none}.form-input-sm:focus{border-color:var(--accent)}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px}
  .form-group{margin-bottom:12px}
  .switch{width:36px;height:20px;background:#3A3A3A;border-radius:10px;cursor:pointer;position:relative;display:inline-block;flex-shrink:0;transition:.15s}
  .switch.on{background:var(--accent)}.switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.15s}
  .switch.on::after{left:18px}
  table{width:100%;border-collapse:collapse}
- th{padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);background:#1A1A1A;border-bottom:1px solid var(--card-border);white-space:nowrap}
- td{padding:7px 10px;border-bottom:1px solid #2A2A2A;font-size:12px;vertical-align:middle}
+th{padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);background:var(--content-bg);border-bottom:1px solid var(--card-border);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--card-border);font-size:12px;vertical-align:middle}
  tr:hover{background:#1A1A1A}
  .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
  .badge-succ{background:rgba(0,212,170,.1);color:var(--success)}.badge-danger{background:rgba(255,77,79,.1);color:var(--danger)}
@@ -89,15 +93,16 @@
  .mapping-sep{color:var(--text3);flex-shrink:0}
  .mapping-sources{display:flex;flex-wrap:wrap;gap:4px;flex:1;align-items:center}
  .mapping-source-tag{background:#222;border:1px solid var(--card-border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px}
- .mapping-source-tag input{border:none;background:transparent;font-size:11px;color:var(--text2);font-family:inherit;outline:none;padding:0;width:60px}
+ .mapping-source-tag input{border:none;background:transparent;font-size:11px;color:var(--text2);font-family:inherit;outline:none;padding:0;width:80px}
  .textarea-large{width:100%;min-height:200px;padding:12px;border:1px solid var(--card-border);border-radius:6px;font-family:monospace;font-size:12px;line-height:1.8;background:#1A1A1A;color:var(--text);resize:vertical;outline:none}
  .textarea-large:focus{border-color:var(--accent)}
  .url-row{display:flex;align-items:center;padding:8px 12px;background:#1A1A1A;border-radius:6px;font-size:12px;gap:8px;flex-wrap:wrap}
  .url-label{font-weight:600;color:var(--text2);flex-shrink:0;font-size:11px}
- .url-value{color:var(--accent);font-family:monospace;font-size:12px;flex:1;word-break:break-all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.col-name{max-width:100px;width:auto}.col-url{min-width:0;width:auto}.col-ua{width:130px}
+ .url-value{color:var(--accent);font-family:monospace;font-size:12px;flex:1;word-break:break-all;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.col-url{min-width:0;width:auto}.col-ua{width:130px}
  a.url-value{text-decoration:none}a.url-value:hover{text-decoration:underline}
  .help-text{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.6}
  .help-text code{background:#1A1A1A;padding:1px 5px;border-radius:3px;font-size:10px;color:var(--accent)}
+.hint{font-size:12px;color:var(--text3);line-height:1.6}.empty-hint{color:var(--text3);font-size:12px;text-align:center;padding:20px 0}
  .progress-bar{height:6px;background:#2A2A2A;border-radius:3px;overflow:hidden;margin:8px 0}
  .progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s}
  .ghost{opacity:.4;border:2px dashed var(--accent)!important}
@@ -126,8 +131,7 @@
      <button class="nav-item" :class="{active:tab==='categories'}" @click="goto('categories')"><span class="nav-icon">&#9776;</span>频道分类</button>
      <button class="nav-item" :class="{active:tab==='mapping'}" @click="goto('mapping')"><span class="nav-icon">&#8596;</span>规则映射</button>
      <button class="nav-item" :class="{active:tab==='filter'}" @click="goto('filter')"><span class="nav-icon">&#128683;</span>屏蔽过滤</button>
-    <button class="nav-item" :class="{active:tab==='blacklist'}" @click="goto('blacklist')"><span class="nav-icon">&#128308;</span>黑白名单</button>
-   <button class="nav-item" :class="{active:tab==='logs'}" @click="goto('logs')"><span class="nav-icon">&#128220;</span>操作日志</button>
+  <button class="nav-item" :class="{active:tab==='logs'}" @click="goto('logs')"><span class="nav-icon">&#128220;</span>操作日志</button>
   </nav>
    <div class="sidebar-footer">
      <button class="save-btn" @click="saveAll" :disabled="saving">{{saving?'保存中...':'保存全部配置'}}</button>
@@ -157,7 +161,7 @@
          </div>
          <div class="panel-body">
            <div class="tag-grid" ref="sortGridRef">
-             <div v-for="(g,i) in (cfg.sortOrder||[])" :key="g" class="tag-item" :data-idx="i" :data-group="g">
+             <div v-for="(g,i) in (visibleSortOrder||[])" :key="g" class="tag-item" :data-idx="i" :data-group="g">
                <span class="grab" style="cursor:grab;color:var(--text3)">&#9776;</span>
                <span class="tag-input">{{g}}</span>
                <span class="tag-count">{{stats[g]||0}}</span>
@@ -172,18 +176,18 @@
                <button class="btn btn-outline btn-xs" @click="addSortGroup">+ 添加</button>
              </div>
            </div>
-           <div v-if="Object.keys(stats||{}).length===0" style="color:var(--text3);font-size:12px;padding:8px 0;">点击刷新加载统计数据</div>
+           <div v-if="Object.keys(stats||{}).length===0" class="empty-hint">点击刷新加载统计数据</div>
            <div v-if="groupAddError" style="color:var(--danger);font-size:12px;margin-top:6px">{{groupAddError}}</div>
          </div>
        </div>
       <div class="panel">
         <div class="panel-header">
           <span>精简频道分组统计与排序 <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">· 共 {{liteTotal}} 个频道</span></span>
-          <span style="font-size:11px;color:var(--text3)">拖拽排序</span>
+          <div class="flex items-center gap-2"><button class="btn btn-outline btn-sm" @click="loadStats"><span :class="{spinning:loadingStats}">&#8634;</span> 刷新</button><span style="font-size:11px;color:var(--text3)">拖拽排序</span></div>
         </div>
         <div class="panel-body">
           <div class="tag-grid" ref="liteSortGridRef">
-            <div v-for="item in (liteDisplayList||[])" :key="item" class="tag-item" :data-name="item">
+            <div v-for="item in (visibleLiteDisplayList||[])" :key="item" class="tag-item" :data-name="item">
               <span class="grab" style="cursor:grab;color:var(--text3)">&#9776;</span>
               <span class="tag-input">{{item}}</span>
               <span class="tag-count">{{stats[item]||0}}</span>
@@ -193,6 +197,7 @@
               <button class="btn btn-outline btn-xs" @click="addLiteCat">+ 添加</button>
             </div>
           </div>
+          <div v-if="Object.keys(stats||{}).length===0" class="empty-hint">点击刷新加载统计数据</div>
           <div v-if="liteAddError" style="color:var(--danger);font-size:12px;margin-top:6px">{{liteAddError}}</div>
         </div>
       </div>
@@ -202,7 +207,7 @@
         <div class="panel-body flex flex-wrap gap-2">
           <button class="btn btn-primary" @click="exportConfig">&#128229; 导出配置</button>
           <button class="btn btn-outline" @click="triggerImport()">&#128228; 导入配置</button>
-          <button class="btn btn-outline" style="color:var(--danger)" @click="resetConfig">&#8634; 恢复默认</button>
+          <button class="btn btn-danger" @click="resetConfig">&#8634; 恢复默认</button>
           <input type="file" id="importFile" style="display:none" accept=".json" @change="importConfig">
         </div>
       </div>
@@ -213,65 +218,48 @@
       <div class="panel">
         <div class="panel-header">EPG 节目单</div>
         <div class="panel-body">
-          <div class="url-row"><span class="url-label">EPG 地址</span><input class="form-input" v-model="cfg.epgUrl" style="flex:1;font-family:monospace;font-size:12px"></div>
+          <div class="url-row"><span class="url-label">EPG 地址</span><input class="form-input form-input-sm" v-model="cfg.epgUrl" style="flex:1;font-family:monospace"></div>
         </div>
       </div>
 
       <div style="display:flex;gap:14px;flex-wrap:wrap">
         <div class="panel" style="flex:1;min-width:280px">
-          <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div class="panel-header">
             <span>Logo 设置</span>
             <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px">启用 Logo <div class="switch" :class="{on:cfg.enableLogo}" @click="cfg.enableLogo=!cfg.enableLogo"></div></label>
           </div>
           <div class="panel-body">
-            <input class="form-input" v-model="cfg.logoTemplate" placeholder="https://example.com/logo/{}.png" style="font-family:monospace;font-size:12px">
+            <input class="form-input form-input-sm" v-model="cfg.logoTemplate" placeholder="https://example.com/logo/{}.png" style="font-family:monospace">
           </div>
         </div>
         <div class="panel" style="flex:1;min-width:280px">
-          <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div class="panel-header">
             <span>User-Agent</span>
-            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px">远程源拉取超时（秒）<input class="form-input" type="number" v-model.number="cfg.fetchTimeout" style="width:50px;padding:2px 5px;font-size:11px"></label>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px">远程源拉取超时（秒）<input class="form-input form-input-sm" type="number" v-model.number="cfg.fetchTimeout" style="width:50px"></label>
           </div>
           <div class="panel-body">
-            <input class="form-input" v-model="cfg.userAgent" placeholder="Mozilla/5.0 ..." style="font-family:monospace;font-size:12px">
+            <input class="form-input form-input-sm" v-model="cfg.userAgent" placeholder="Mozilla/5.0 ..." style="font-family:monospace">
           </div>
         </div>
       </div>
 
       <div class="panel">
-        <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div class="panel-header" style="gap:10px;flex-wrap:wrap">
           <span>订阅源列表</span>
           <div class="flex items-center gap-2 flex-wrap">
             <button class="btn btn-outline btn-sm" @click="addM3u">+ 新增订阅</button>
             <button class="btn btn-sm" :class="cfg.enableMultiSource?'btn-primary':'btn-outline'" @click="cfg.enableMultiSource=!cfg.enableMultiSource">{{cfg.enableMultiSource?'多路线:开':'多路线:关'}}</button>
-            <button class="btn btn-primary btn-sm" @click="startSpeedtest" :disabled="speedtestRunning">{{speedtestRunning?'测速中...':'&#9889; 一键测速'}}</button>
-            <label class="flex items-center gap-1" style="font-size:12px;color:var(--text2)">响应阈值 <input class="form-input" type="number" v-model.number="cfg.responseTimeThreshold" style="width:64px;padding:2px 5px;font-size:11px"> ms</label>
-            <label class="flex items-center gap-1" style="font-size:12px;color:var(--text2)">自动测速 <input class="form-input" type="number" v-model.number="cfg.speedtestInterval" style="width:46px;padding:2px 5px;font-size:11px"> 天</label>
-          </div>
-        </div>
-        <div class="panel-body" style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.08)">
-          <div v-if="speedtestRunning">
-            <div class="flex justify-between" style="font-size:12px;color:var(--text2)">
-              <span>进度：{{speedtestProgress.completed}}/{{speedtestProgress.total}}</span>
-              <span>通过：<span style="color:var(--success)">{{speedtestProgress.passed}}</span> / 失败：<span style="color:var(--danger)">{{speedtestProgress.failed}}</span></span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" :style="{width:speedtestProgress.progress+'%'}"></div></div>
-          </div>
-          <div style="font-size:12px;color:var(--text2)">
-            最新测速时间：<b style="color:var(--accent)">{{listMeta.lastSpeedtest||'—'}}</b>
-            <span v-if="speedtestLastResult" style="margin-left:10px;color:var(--text3)">（本次会话）通过 {{speedtestLastResult.passed}} / 失败 {{speedtestLastResult.failed}}</span>
           </div>
         </div>
         <div class="panel-body" style="padding:0">
-          <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th class="col-ua">名称</th><th style="width:130px">测速时间</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:90px">响应时间</th><th style="width:90px">HTTP状态</th><th style="width:30px"></th></tr></thead>
+          <table><thead><tr><th style="width:30px"></th><th style="width:40px">启用</th><th class="col-ua">名称</th><th class="col-url">订阅源地址</th><th class="col-ua">UA</th><th style="width:70px">注入</th><th style="width:70px">状态</th><th style="width:90px">响应时间</th><th style="width:90px">HTTP状态</th><th style="width:30px"></th></tr></thead>
           <tbody ref="m3uTableRef">
             <tr v-for="(s,i) in cfg.m3uList" :key="s.__id||i" :data-idx="i">
               <td style="cursor:grab;color:var(--text3);text-align:center;width:30px">&#9776;</td>
               <td style="text-align:center"><div class="switch" :class="{on:s.enabled}" @click="s.enabled=!s.enabled"></div></td>
-              <td><input class="form-input" v-model="s.name" style="width:100%;padding:3px 6px;font-size:12px"></td>
-              <td style="font-size:11px;color:var(--text3);text-align:center;white-space:nowrap">{{speedtestLastResult?speedtestLastResult.time:'—'}}</td>
-              <td><input class="form-input" v-model="s.url" style="width:100%;font-family:monospace;font-size:11px;padding:3px 6px"></td>
-              <td><input class="form-input" v-model="s.ua" style="width:100%;font-size:11px;padding:3px 6px"></td>
+              <td><input class="form-input form-input-sm" v-model="s.name"></td>
+              <td><input class="form-input form-input-sm" v-model="s.url" style="font-family:monospace"></td>
+              <td><input class="form-input form-input-sm" v-model="s.ua" style="font-family:monospace"></td>
               <td style="text-align:center"><div class="switch" :class="{on:s.uaToUrl}" @click="s.uaToUrl=!s.uaToUrl"></div></td>
               <td><span v-if="health[s.name]" class="badge" :class="health[s.name].ok?'badge-succ':'badge-danger'"><span class="status-dot" :class="health[s.name].ok?'on':'off'"></span>{{health[s.name].ok?'在线':'异常'}}</span><span v-else class="badge badge-info">未知</span></td>
               <td style="font-size:11px;color:var(--text3);text-align:center">{{health[s.name]?health[s.name].time+'ms':'—'}}</td>
@@ -294,8 +282,8 @@
            <table><thead><tr><th>分类名</th><th>包含频道</th><th style="width:30px"></th></tr></thead>
            <tbody>
              <tr v-for="(cat,i) in mainChannels" :key="i">
-               <td style="width:120px"><input class="form-input" v-model="cat.name" style="padding:3px 6px;font-size:12px;font-weight:600"></td>
-               <td><input class="form-input" v-model="cat.channelInput" placeholder="频道名, 逗号分隔" style="font-size:11px;padding:3px 6px;font-family:monospace" @change="parseChannels(cat)"></td>
+              <td style="width:120px"><input class="form-input form-input-sm" v-model="cat.name" style="font-weight:600"></td>
+              <td><input class="form-input form-input-sm" v-model="cat.channelInput" placeholder="频道名, 逗号分隔" style="font-family:monospace" @change="parseChannels(cat)"></td>
                <td><button class="del-btn" @click="mainChannels.splice(i,1)">&times;</button></td>
              </tr>
            </tbody></table>
@@ -311,8 +299,8 @@
            <table><thead><tr><th>分类名</th><th>包含频道</th><th style="width:30px"></th></tr></thead>
            <tbody>
              <tr v-for="(cat,i) in localChannels" :key="i">
-               <td style="width:120px"><input class="form-input" v-model="cat.name" style="padding:3px 6px;font-size:12px;font-weight:600"></td>
-               <td><input class="form-input" v-model="cat.channelInput" placeholder="频道名, 逗号分隔" style="font-size:11px;padding:3px 6px;font-family:monospace" @change="parseChannelsLocal(cat)"></td>
+              <td style="width:120px"><input class="form-input form-input-sm" v-model="cat.name" style="font-weight:600"></td>
+              <td><input class="form-input form-input-sm" v-model="cat.channelInput" placeholder="频道名, 逗号分隔" style="font-family:monospace" @change="parseChannelsLocal(cat)"></td>
                <td><button class="del-btn" @click="localChannels.splice(i,1)">&times;</button></td>
              </tr>
            </tbody></table>
@@ -329,12 +317,12 @@
          </div>
          <div class="panel-body">
            <div v-for="(aliases,target) in (cfg.groupReplaceRules||{})" :key="target" class="mapping-row">
-             <input class="form-input" :value="target" @change="renameGroupRule(target,$event.target.value)" style="width:120px;padding:4px 6px;font-size:12px;font-weight:700;color:var(--accent)">
+             <input class="form-input form-input-sm" :value="target" @change="renameGroupRule(target,$event.target.value)" style="width:120px;font-weight:700;color:var(--accent)">
              <span class="mapping-sep">&#8592;</span>
              <div class="mapping-sources">
                <span v-for="(a,ai) in aliases" :key="ai" class="mapping-source-tag">
                  <input :value="a" @change="cfg.groupReplaceRules[target][ai]=$event.target.value">
-                 <span class="del-btn" style="font-size:12px" @click="cfg.groupReplaceRules[target].splice(ai,1)">&times;</span>
+                 <span class="del-btn" @click="cfg.groupReplaceRules[target].splice(ai,1)">&times;</span>
                </span>
                <button class="btn btn-xs btn-ghost" @click="cfg.groupReplaceRules[target].push('')">+</button>
              </div>
@@ -351,12 +339,12 @@
          </div>
          <div class="panel-body">
            <div v-for="(aliases,std) in (cfg.nameReplaceRules||{})" :key="std" class="mapping-row">
-             <input class="form-input" :value="std" @change="renameNameRule(std,$event.target.value)" style="width:100px;padding:4px 6px;font-size:12px;font-weight:700;color:var(--accent)">
+             <input class="form-input form-input-sm" :value="std" @change="renameNameRule(std,$event.target.value)" style="width:100px;font-weight:700;color:var(--accent)">
              <span class="mapping-sep">=</span>
              <div class="mapping-sources">
                <span v-for="(a,ai) in aliases" :key="ai" class="mapping-source-tag">
                  <input :value="a" @change="cfg.nameReplaceRules[std][ai]=$event.target.value" style="width:80px">
-                 <span class="del-btn" style="font-size:12px" @click="cfg.nameReplaceRules[std].splice(ai,1)">&times;</span>
+                 <span class="del-btn" @click="cfg.nameReplaceRules[std].splice(ai,1)">&times;</span>
                </span>
                <button class="btn btn-xs btn-ghost" @click="cfg.nameReplaceRules[std].push('')">+</button>
              </div>
@@ -393,66 +381,18 @@
          <div class="panel-header">频道地址替换 <span class="badge badge-info">{{Object.keys(cfg.urlReplaceRules||{}).length}}</span></div>
          <div class="panel-body">
            <div v-for="(to,from) in (cfg.urlReplaceRules||{})" :key="from" class="mapping-row">
-             <input class="form-input" :value="from" @change="renameUrlRule(from,$event.target.value)" style="flex:1;font-family:monospace;font-size:11px;padding:4px 6px"><span class="mapping-sep">&#8594;</span>
-             <input class="form-input" :value="to" @change="cfg.urlReplaceRules[from]=$event.target.value" style="flex:1;font-family:monospace;font-size:11px;padding:4px 6px">
+             <input class="form-input form-input-sm flex-1" :value="from" @change="renameUrlRule(from,$event.target.value)" style="font-family:monospace"><span class="mapping-sep">&#8594;</span>
+             <input class="form-input form-input-sm flex-1" :value="to" @change="cfg.urlReplaceRules[from]=$event.target.value" style="font-family:monospace">
              <button class="del-btn" @click="delete cfg.urlReplaceRules[from];cfg.urlReplaceRules={...cfg.urlReplaceRules}">&times;</button>
            </div>
-           <div class="mapping-row mt-2"><input class="form-input" v-model="newUrlFrom" placeholder="原地址前缀" style="flex:1;font-family:monospace;font-size:11px;padding:4px 6px"><span class="mapping-sep">&#8594;</span><input class="form-input" v-model="newUrlTo" placeholder="替换地址" style="flex:1;font-family:monospace;font-size:11px;padding:4px 6px"><button class="btn btn-outline btn-sm" @click="addUrlRule">添加</button></div>
+           <div class="mapping-row mt-2"><input class="form-input form-input-sm flex-1" v-model="newUrlFrom" placeholder="原地址前缀" style="font-family:monospace"><span class="mapping-sep">&#8594;</span><input class="form-input form-input-sm flex-1" v-model="newUrlTo" placeholder="替换地址" style="font-family:monospace"><button class="btn btn-outline btn-sm" @click="addUrlRule">添加</button></div>
          </div>
        </div>
      </div>
 
-     <!-- ===== 黑白名单 ===== -->
-     <div class="page" :class="{active:tab==='blacklist'}">
-       <div class="flex gap-3" style="height:calc(100vh - 200px)">
-         <div class="panel" style="flex:1;display:flex;flex-direction:column">
-           <div class="panel-header">
-             <span>白名单 ({{whiteList.length}}) <span style="font-size:11px;color:var(--text3);font-weight:400">· 生成于 {{listMeta.whitelist||'—'}}</span></span>
-             <button class="btn btn-outline btn-sm" @click="showAddWhite=true">+ 添加</button>
-           </div>
-           <div class="panel-body" style="flex:1;overflow-y:auto;padding:0">
-             <div v-if="showAddWhite" class="flex gap-2" style="padding:8px;border-bottom:1px solid var(--card-border)">
-               <input class="form-input" v-model="newWhiteUrl" placeholder="URL 地址" style="flex:1;font-family:monospace;font-size:11px">
-               <button class="btn btn-primary btn-sm" @click="addWhiteListItem">确认</button>
-               <button class="btn btn-outline btn-sm" @click="showAddWhite=false">取消</button>
-             </div>
-             <table><thead><tr><th>URL</th><th style="width:70px">响应时间</th><th style="width:60px">来源</th><th style="width:30px"></th></tr></thead>
-             <tbody><tr v-for="(w,i) in whiteList" :key="i"><td style="font-family:monospace;font-size:10px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{typeof w==='string'?w:w.url}}</td><td>{{w.time||'-'}}ms</td><td><span class="badge" :class="w.source==='manual'?'badge-succ':'badge-info'">{{w.source||'auto'}}</span></td><td><button class="del-btn" @click="removeWhite(i)">&times;</button></td></tr></tbody></table>
-           </div>
-         </div>
-         <div class="panel" style="flex:1;display:flex;flex-direction:column">
-           <div class="panel-header">
-             <span>黑名单 ({{blackList.length}}) <span style="font-size:11px;color:var(--text3);font-weight:400">· 生成于 {{listMeta.blacklist||'—'}}</span></span>
-             <button class="btn btn-outline btn-sm" @click="showAddBlack=true">+ 添加</button>
-           </div>
-           <div class="panel-body" style="flex:1;overflow-y:auto;padding:0">
-             <div v-if="showAddBlack" class="flex gap-2" style="padding:8px;border-bottom:1px solid var(--card-border)">
-               <input class="form-input" v-model="newBlackUrl" placeholder="URL 地址" style="flex:1;font-family:monospace;font-size:11px">
-               <button class="btn btn-primary btn-sm" @click="addBlackListItem">确认</button>
-               <button class="btn btn-outline btn-sm" @click="showAddBlack=false">取消</button>
-             </div>
-             <table><thead><tr><th>URL</th><th style="width:70px">原因</th><th style="width:60px">来源</th><th style="width:30px"></th></tr></thead>
-             <tbody><tr v-for="(b,i) in blackList" :key="i"><td style="font-family:monospace;font-size:10px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{typeof b==='string'?b:b.url}}</td><td>{{b.reason||'-'}}</td><td><span class="badge" :class="b.source==='manual'?'badge-succ':'badge-danger'">{{b.source||'auto'}}</span></td><td><button class="del-btn" @click="removeBlack(i)">&times;</button></td></tr></tbody></table>
-           </div>
-         </div>
-       </div>
-     </div>
 
     <!-- ===== 操作日志 ===== -->
     <div class="page" :class="{active:tab==='logs'}">
-      <div class="panel">
-        <div class="panel-header">
-          <span>运行时间概览</span>
-          <div class="flex items-center gap-2">
-            <button class="btn btn-outline btn-sm" @click="loadLogs"><span :class="{spinning:loadingLogs}">&#8634;</span> 刷新</button>
-          </div>
-        </div>
-        <div class="panel-body flex flex-wrap gap-4">
-          <div style="font-size:13px">最新测速时间：<b style="color:var(--accent)">{{listMeta.lastSpeedtest||'—'}}</b></div>
-          <div style="font-size:13px">黑名单生成时间：<b style="color:var(--accent)">{{listMeta.blacklist||'—'}}</b></div>
-          <div style="font-size:13px">白名单生成时间：<b style="color:var(--accent)">{{listMeta.whitelist||'—'}}</b></div>
-        </div>
-      </div>
       <div class="panel">
         <div class="panel-header">操作日志（最近 7 天，自动清理）</div>
         <div class="panel-body" style="padding:0">
@@ -464,7 +404,7 @@
                 <td style="font-size:12px;font-weight:600;color:var(--text)">{{l.action}}</td>
                 <td style="font-size:11px;color:var(--text2)">{{l.detail||''}}</td>
               </tr>
-              <tr v-if="logs.length===0"><td colspan="4" style="color:var(--text3);text-align:center;padding:20px">最近 7 天暂无操作记录</td></tr>
+              <tr v-if="logs.length===0"><td colspan="4" class="empty-hint">最近 7 天暂无操作记录</td></tr>
             </tbody></table>
         </div>
       </div>
@@ -480,28 +420,30 @@
  function http(url,opts){return fetch(url,{credentials:'same-origin',headers:{'Content-Type':'application/json'},...opts}).then(function(r){return r.json()})}
    try{var app=Vue.createApp({setup(){
    var tab=Vue.ref('overview');
-   var cfg=Vue.ref({m3uList:[],deleteGroups:[],channelBlockKeywords:[],removalList:[],groupReplaceRules:{},nameReplaceRules:{},urlReplaceRules:{},epgUrl:'',enableEpg:true,logoTemplate:'',enableLogo:true,enableMultiSource:true,singleChannelMaxCount:5,responseTimeThreshold:2000,speedtestInterval:3,userAgent:'',fetchTimeout:10,liteSortTypes:[]});
+   var cfg=Vue.ref({m3uList:[],deleteGroups:[],channelBlockKeywords:[],removalList:[],groupReplaceRules:{},nameReplaceRules:{},urlReplaceRules:{},epgUrl:'',enableEpg:true,logoTemplate:'',enableLogo:true,enableMultiSource:true,singleChannelMaxCount:5,userAgent:'',fetchTimeout:10,liteSortTypes:[]});
    var stats=Vue.ref({});var mainChannels=Vue.ref([]);var localChannels=Vue.ref([]);
-   var whiteList=Vue.ref([]);var blackList=Vue.ref([]);var health=Vue.ref({});
+   var health=Vue.ref({});
    var origin=Vue.ref('');var saving=Vue.ref(false);var loadingStats=Vue.ref(false);
-   var speedtestRunning=Vue.ref(false);var speedtestProgress=Vue.ref({completed:0,total:0,passed:0,failed:0,progress:0});
-   var speedtestLastResult=Vue.ref(null);
    var newDelGroup=Vue.ref('');var newBlockKey=Vue.ref('');var newRemoval=Vue.ref('');
-   var newUrlFrom=Vue.ref('');var newUrlTo=Vue.ref('');var newWhiteUrl=Vue.ref('');var newBlackUrl=Vue.ref('');
-   var showAddWhite=Vue.ref(false);var showAddBlack=Vue.ref(false);
-   var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);var newGroupName=Vue.ref('');var groupAddError=Vue.ref('');var liteAddError=Vue.ref('');
+   var newUrlFrom=Vue.ref('');var newUrlTo=Vue.ref('');
+    var sortGridRef=Vue.ref(null);var m3uTableRef=Vue.ref(null);var newGroupName=Vue.ref('');var groupAddError=Vue.ref('');var liteAddError=Vue.ref('');
    var newLiteCat=Vue.ref('');
-   var listMeta=Vue.ref({});
-  var logs=Vue.ref([]);
+   var logs=Vue.ref([]);
   var loadingLogs=Vue.ref(false);
 
-   var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','blacklist':'黑白名单','logs':'操作日志'};return t[tab.value]||''});
+   var menuTitle=Vue.computed(function(){var t={'overview':'汇总概况','sources':'订阅管理','categories':'频道分类','mapping':'规则映射','filter':'屏蔽过滤','logs':'操作日志'};return t[tab.value]||''});
    
    var liteSortGridRef=Vue.ref(null);var liteDisplayList=Vue.computed(function(){var real=(mainChannels.value||[]).map(function(c){return c.name}).concat(['其他频道']);var pref=cfg.value.liteSortTypes||[];var set=new Set(pref);var rest=real.filter(function(c){return !set.has(c)});return pref.concat(rest)});var liteSortCounts=Vue.computed(function(){var o={};var s=stats.value||{};for(var k in s)o[k]=s[k];return o});var statsOrder=Vue.computed(function(){var o=cfg.value.sortOrder||[];var s=stats.value;var r=[];for(var g of o){r.push({group:g,count:s[g]||0})}var used=new Set(o);for(var g in s){if(!used.has(g))r.push({group:g,count:s[g]})}return r});
    var extraGroups=Vue.computed(function(){var o=cfg.value.sortOrder||[];var used2=new Set(o);var r2=[];var s2=stats.value||{};for(var g in s2){if(!used2.has(g))r2.push(g)}return r2});
    // 频道总数：完整版 = 所有分组计数之和；精简版 = 主频道分类 + 其他频道 的计数之和
    var fullTotal=Vue.computed(function(){var s=stats.value||{};var t=0;for(var k in s)t+=(s[k]||0);return t});
    var liteTotal=Vue.computed(function(){var s=stats.value||{};var t=0;var list=liteDisplayList.value||[];for(var i=0;i<list.length;i++){t+=(s[list[i]]||0)}return t});
+
+   // 需求2：频道数为 0 的分组在拖拽排序中不显示（stats 未加载时仍显示全部，避免误隐藏）
+   function hasStats(){return Object.keys(stats.value||{}).length>0}
+   var visibleSortOrder=Vue.computed(function(){var s=stats.value||{};if(!hasStats())return cfg.value.sortOrder||[];return (cfg.value.sortOrder||[]).filter(function(g){return (s[g]||0)>0})});
+   var visibleExtraGroups=Vue.computed(function(){var s=stats.value||{};if(!hasStats())return extraGroups.value||[];return (extraGroups.value||[]).filter(function(g){return (s[g]||0)>0})});
+   var visibleLiteDisplayList=Vue.computed(function(){var s=stats.value||{};if(!hasStats())return liteDisplayList.value||[];return (liteDisplayList.value||[]).filter(function(item){return (s[item]||0)>0})});
 
    function isEmpty(obj){if(!obj)return true;for(var k in obj)return false;return true}
    function copy(t){navigator.clipboard.writeText(t).then(function(){toast('已复制: '+t)})}
@@ -533,49 +475,32 @@
    function addUrlRule(){if(newUrlFrom.value.trim()&&newUrlTo.value.trim()){cfg.value.urlReplaceRules[newUrlFrom.value.trim()]=newUrlTo.value.trim();cfg.value.urlReplaceRules={...cfg.value.urlReplaceRules};newUrlFrom.value='';newUrlTo.value=''}}
    function renameUrlRule(oldKey,newKey){if(newKey!==oldKey&&newKey){cfg.value.urlReplaceRules[newKey]=cfg.value.urlReplaceRules[oldKey];delete cfg.value.urlReplaceRules[oldKey];cfg.value.urlReplaceRules={...cfg.value.urlReplaceRules}}}
 
-   function addWhiteListItem(){if(newWhiteUrl.value.trim()){whiteList.value.push({url:newWhiteUrl.value.trim(),time:0,source:'manual'});newWhiteUrl.value='';showAddWhite.value=false;saveBlacklistOnly()}}
-   function removeWhite(i){whiteList.value.splice(i,1);saveBlacklistOnly()}
-   function addBlackListItem(){if(newBlackUrl.value.trim()){blackList.value.push({url:newBlackUrl.value.trim(),reason:'manual',source:'manual'});newBlackUrl.value='';showAddBlack.value=false;saveBlacklistOnly()}}
-   function removeBlack(i){blackList.value.splice(i,1);saveBlacklistOnly()}
-   function saveBlacklistOnly(){http(api.base+'/blacklist/save',{method:'POST',body:JSON.stringify(blackList.value.map(function(b){return typeof b==='string'?b:b.url}))}).then(function(){http(api.base+'/whitelist/save',{method:'POST',body:JSON.stringify(whiteList.value)}).then(function(){toast('黑白名单已保存')})})}
 
    function loadLogs(){loadingLogs.value=true;http(api.base+'/logs').then(function(r){logs.value=r||[];loadingLogs.value=false})}
   function goto(t){tab.value=t;if(t==='logs')loadLogs()}
    function addLiteCat(){var n=newLiteCat.value.trim();liteAddError.value='';if(!n){liteAddError.value='名称不能为空';return}var list=cfg.value.liteSortTypes||[];for(var k=0;k<list.length;k++){if(list[k].toLowerCase()===n.toLowerCase()){liteAddError.value='已存在同名分类';return}}if(!cfg.value.liteSortTypes)cfg.value.liteSortTypes=[];cfg.value.liteSortTypes.push(n);newLiteCat.value=''}
    function addSortGroup(){var n=newGroupName.value.trim();groupAddError.value='';if(!n){groupAddError.value='名称不能为空';return}var ord=cfg.value.sortOrder||[];var all=ord.concat(extraGroups.value);for(var k=0;k<all.length;k++){if(all[k].toLowerCase()===n.toLowerCase()){groupAddError.value='已存在同名分组';return}}if(!cfg.value.sortOrder)cfg.value.sortOrder=[];cfg.value.sortOrder.push(n);newGroupName.value=''}
-   function startSpeedtest(){speedtestRunning.value=true;speedtestProgress.value={completed:0,total:0,passed:0,failed:0,progress:0};
-     http(api.base+'/speedtest/start',{method:'POST'}).then(function(r){toast(r.message||'测速已启动');pollSpeedtest()})}
-   function pollSpeedtest(){http(api.base+'/speedtest/status').then(function(r){
-    // 测速记录尚未落库（KV 读延迟）时继续轮询，避免被误判为“已完成”而提前终止
-    if(r.running===false && typeof r.total==='undefined'){setTimeout(pollSpeedtest,2000);return;}
-    speedtestProgress.value=r;
-    if(r.running){setTimeout(pollSpeedtest,2000);return;}
-    speedtestRunning.value=false;
-    speedtestLastResult.value={time:new Date().toLocaleString('zh-CN'),passed:r.passed||0,failed:r.failed||0};
-    // 无论通过/失败数量，完成后都重新拉取黑白名单与生成时间，确保界面与 KV 一致
-    http(api.base+'/whitelist').then(function(w){whiteList.value=w||[]});
-    http(api.base+'/blacklist').then(function(b){blackList.value=b||[]});
-    http(api.base+'/list-meta').then(function(m){listMeta.value=m||{}});
-    toast('测速完成：通过 '+(r.passed||0)+' / 失败 '+(r.failed||0))
-  })}
 
    function triggerImport(){document.getElementById('importFile').click()}
    function exportConfig(){var blob=new Blob([JSON.stringify(cfg.value,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='iptv-config.json';a.click();toast('配置已导出')}
    function importConfig(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){try{var data=JSON.parse(ev.target.result);Object.assign(cfg.value,data);toast('配置已导入')}catch(err){toast('导入失败: '+err.message)}};reader.readAsText(file,'utf-8')}
    function resetConfig(){if(!confirm('确认恢复默认配置？\\n当前修改（含频道分类与纠错规则）将全部丢失。'))return;http(api.base+'/reset',{method:'POST'}).then(function(){toast('已恢复默认配置');location.reload()}).catch(function(){toast('恢复失败，请重试')})}
 
-   function saveAll(){saving.value=true;
-     // 同步频道分类的 channelInput
-     for(var cat of mainChannels.value){cat.channelInput=cat.channels.join(', ')}
-     for(var cat of localChannels.value){cat.channelInput=cat.channels.join(', ')}
+  function saveAll(){saving.value=true;
+    // 同步频道分类的 channelInput
+    for(var cat of mainChannels.value){cat.channelInput=cat.channels.join(', ')}
+    for(var cat of localChannels.value){cat.channelInput=cat.channels.join(', ')}
 
-     Promise.all([
-       http(api.base+'/save',{method:'POST',body:JSON.stringify(cfg.value)}),
-       
-       http(api.base+'/channels/save',{method:'POST',body:JSON.stringify({main:mainChannels.value,local:localChannels.value})}),
-       http(api.base+'/whitelist/save',{method:'POST',body:JSON.stringify(whiteList.value)}),
-       http(api.base+'/blacklist/save',{method:'POST',body:JSON.stringify(blackList.value.map(function(b){return typeof b==='string'?b:b.url}))})
-     ]).then(function(){saving.value=false;toast('全部配置已保存')}).catch(function(){saving.value=false;toast('保存失败，请重试')})
+    // 需求2：直接移除频道数为 0 的分组（含排序配置）；仅当该分组已在 stats 中且计数为 0 才移除，避免 stats 未加载时误删
+    var _s=stats.value||{};
+    function pruneZero(list){return (list||[]).filter(function(g){return !(g in _s) || (_s[g]||0)>0})}
+    cfg.value.sortOrder=pruneZero(cfg.value.sortOrder);
+    cfg.value.liteSortTypes=pruneZero(cfg.value.liteSortTypes);
+
+    Promise.all([
+      http(api.base+'/save',{method:'POST',body:JSON.stringify(cfg.value)}),
+      http(api.base+'/channels/save',{method:'POST',body:JSON.stringify({main:mainChannels.value,local:localChannels.value})})
+    ]).then(function(){saving.value=false;toast('全部配置已保存')}).catch(function(){saving.value=false;toast('保存失败，请重试')})
    }
 
    var sortableInstances=[];
@@ -587,40 +512,33 @@
   })}
 
   // 列表内容变化后重新绑定拖拽，避免 Vue 重渲染导致 Sortable 监听失效
-  Vue.watch(liteDisplayList, function(){Vue.nextTick(initSortable)});
-  Vue.watch(function(){return (cfg.value.sortOrder||[]).join('|')+'||'+(extraGroups.value||[]).join('|')}, function(){Vue.nextTick(initSortable)});
+  Vue.watch(visibleLiteDisplayList, function(){Vue.nextTick(initSortable)});
+  Vue.watch(function(){return (visibleSortOrder.value||[]).join('|')+'||'+(visibleExtraGroups.value||[]).join('|')}, function(){Vue.nextTick(initSortable)});
 
    // 加载初始数据
    origin.value=window.location.origin;
-   Promise.all([
-     http(api.base+'/get').then(function(r){if(r&&typeof r==='object'){r.groupReplaceRules=r.groupReplaceRules||{};r.nameReplaceRules=r.nameReplaceRules||{};r.urlReplaceRules=r.urlReplaceRules||{};r.deleteGroups=r.deleteGroups||[];r.channelBlockKeywords=r.channelBlockKeywords||[];r.removalList=r.removalList||[];if(r.deleteChars){var dc=new Set(r.removalList);r.deleteChars.forEach(function(x){dc.add(x)});r.removalList=Array.from(dc);r.deleteChars=null};r.m3uList=r.m3uList||[];r.liteSortTypes=r.liteSortTypes||[]}cfg.value=r}),
-     
-     http(api.base+'/channels').then(function(r){mainChannels.value=r.main||[];localChannels.value=r.local||[];
-       // 格式化 channelInput
-       for(var cat of mainChannels.value){cat.channelInput=(cat.channels||[]).join(', ')}
-       for(var cat of localChannels.value){cat.channelInput=(cat.channels||[]).join(', ')}
-     }),
-    http(api.base+'/whitelist').then(function(r){whiteList.value=r||[]}),
-    http(api.base+'/blacklist').then(function(r){blackList.value=r||[]}),
-    http(api.base+'/list-meta').then(function(r){listMeta.value=r||{}}),
-    http(api.base+'/logs').then(function(r){logs.value=r||[]}),
-    http(api.base+'/stats').then(function(r){stats.value=r.stats||{};health.value=r.health||{}})
+  Promise.all([
+    http(api.base+'/get').then(function(r){if(r&&typeof r==='object'){r.groupReplaceRules=r.groupReplaceRules||{};r.nameReplaceRules=r.nameReplaceRules||{};r.urlReplaceRules=r.urlReplaceRules||{};r.deleteGroups=r.deleteGroups||[];r.channelBlockKeywords=r.channelBlockKeywords||[];r.removalList=r.removalList||[];if(r.deleteChars){var dc=new Set(r.removalList);r.deleteChars.forEach(function(x){dc.add(x)});r.removalList=Array.from(dc);r.deleteChars=null};r.m3uList=r.m3uList||[];r.liteSortTypes=r.liteSortTypes||[]}cfg.value=r}),
+    
+    http(api.base+'/channels').then(function(r){mainChannels.value=r.main||[];localChannels.value=r.local||[];
+      // 格式化 channelInput
+      for(var cat of mainChannels.value){cat.channelInput=(cat.channels||[]).join(', ')}
+      for(var cat of localChannels.value){cat.channelInput=(cat.channels||[]).join(', ')}
+    }),
+   http(api.base+'/logs').then(function(r){logs.value=r||[]}),
+   http(api.base+'/stats').then(function(r){stats.value=r.stats||{};health.value=r.health||{}})
   ]).then(function(){Vue.nextTick(initSortable)});
 
-   // 定时刷新测速进度
-   setInterval(function(){if(speedtestRunning.value)pollSpeedtest()},3000);
 
-   return {tab,cfg,stats,mainChannels,localChannels,whiteList,blackList,health,origin,saving,loadingStats,fullTotal,liteTotal,
-     speedtestRunning,speedtestProgress,speedtestLastResult,
-     newDelGroup,newBlockKey,newRemoval,newUrlFrom,newUrlTo,newWhiteUrl,newBlackUrl,
-     showAddWhite,showAddBlack,sortGridRef,m3uTableRef,liteSortGridRef,newGroupName,groupAddError,liteAddError,extraGroups,
-     menuTitle,statsOrder,liteDisplayList,listMeta,
-     isEmpty,copy,loadStats,addSortGroup,
-     addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
-     addDelGroup,addBlockKey,addRemoval,addUrlRule,renameUrlRule,
-     addWhiteListItem,removeWhite,addBlackListItem,removeBlack,
-     startSpeedtest,pollSpeedtest,exportConfig,importConfig,resetConfig,saveAll,initSortable,goto,triggerImport,
-     logs,loadLogs,loadingLogs}
+  return {tab,cfg,stats,mainChannels,localChannels,health,origin,saving,loadingStats,fullTotal,liteTotal,
+    newDelGroup,newBlockKey,newRemoval,newUrlFrom,newUrlTo,
+    sortGridRef,m3uTableRef,liteSortGridRef,newGroupName,groupAddError,liteAddError,extraGroups,
+    menuTitle,statsOrder,liteDisplayList,visibleSortOrder,visibleExtraGroups,visibleLiteDisplayList,
+    isEmpty,copy,loadStats,addSortGroup,
+    addM3u,checkHealth,addMainCat,addLocalCat,parseChannels,parseChannelsLocal,addGroupRule,renameGroupRule,addNameRule,renameNameRule,
+    addDelGroup,addBlockKey,addRemoval,addUrlRule,renameUrlRule,
+    exportConfig,importConfig,resetConfig,saveAll,initSortable,goto,triggerImport,
+    logs,loadLogs,loadingLogs}
  }});
  app.mount('#app');}catch(e){document.getElementById('toast').textContent='Vue error: '+e.message;document.getElementById('toast').style.display='block'}
  </script>

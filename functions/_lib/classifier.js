@@ -29,25 +29,12 @@ export function classifyChannels(items, mainChannels, localChannels, config) {
    const singleChnCount = {};
    const maxCount = config.singleChannelMaxCount || 5;
    const removalList = config.removalList || [];
-   const isUnlimited = maxCount === -1;
- 
-   // 构建黑名单 URL 集合
-   const blacklist = new Set(config._blacklist || []);
-   // 构建白名单优先集
-   const whitelistUrls = new Set();
-   const whitelist = config._whitelist || [];
-   for (const wlItem of whitelist) {
-     if (typeof wlItem === 'string') whitelistUrls.add(wlItem);
-     else if (wlItem.url) whitelistUrls.add(wlItem.url);
-   }
- 
-   for (const item of items) {
-     if (!item.name || !item.url) continue;
+  const isUnlimited = maxCount === -1;
 
-     // 黑名单检查
-     if (blacklist.has(item.url)) continue;
+  for (const item of items) {
+    if (!item.name || !item.url) continue;
 
-    // 名称清洗
+   // 名称清洗
     let chName = cleanChannelName(item.name, removalList);
     if (!chName) continue;
 
@@ -112,6 +99,15 @@ export function classifyChannels(items, mainChannels, localChannels, config) {
    for (const cat of mainChannels) { if (!order.includes(cat.name)) order.push(cat.name); }
    for (const cat of localChannels) { if (!order.includes(cat.name)) order.push(cat.name); }
    if (!order.includes('其他频道')) order.push('其他频道');
+
+  // 需求1：将"原始分组"（来源自带、未匹配模版、且有频道的）加入输出顺序，置于「其他频道」之前
+  const originalGroups = Object.keys(classified).filter(cn => {
+    const arr = classified[cn];
+    return arr && arr.length > 0 && cn !== '其他频道' && !order.includes(cn);
+  });
+  const otherIdx = order.indexOf('其他频道');
+  if (otherIdx >= 0) order.splice(otherIdx, 0, ...originalGroups);
+  else order.push(...originalGroups);
 
    for (const catName of order) {
      const items = classified[catName];

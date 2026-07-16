@@ -4,7 +4,7 @@
  
  import { downloadM3u, processM3uContent, processTxtContent, detectFormat, mergeAndDeduplicate } from './processor.js';
  import { classifyChannels, generateClassifiedEntries, renderAsTxt, renderAsM3u } from './classifier.js';
- import { getConfig, getMainChannels, getLocalChannels, getBlacklist, getWhitelist } from './config.js';
+ import { getConfig, getMainChannels, getLocalChannels } from './config.js';
  import { deepClone } from './utils.js';
  
  /**
@@ -14,15 +14,9 @@
  export async function runPipeline(env, { forStatsOnly = false } = {}) {
   const config = await getConfig(env);
   const mainChannels = await getMainChannels(env);
-   const localChannels = await getLocalChannels(env);
-   const blacklist = await getBlacklist(env);
-   const whitelist = await getWhitelist(env);
- 
-   // 将黑白名单注入 config 供分类器使用
-   config._blacklist = blacklist;
-   config._whitelist = whitelist;
- 
-   // 下载所有启用的订阅源
+  const localChannels = await getLocalChannels(env);
+
+  // 下载所有启用的订阅源
    const activeSources = (config.m3uList || []).filter(s => s.enabled !== false);
    const sourceHealth = {};
    const allDownloadedItems = [];
@@ -79,11 +73,16 @@
    const m3u_full = renderAsM3u(fullResult.result, fullResult.epg, fullResult.logo);
 
    // 生成精简版（仅主频道）
-   const liteClassified = {};
-   for (const cat of mainChannels) {
-     if (classified[cat.name]) liteClassified[cat.name] = classified[cat.name];
-   }
-   if (classified['其他频道']) liteClassified['其他频道'] = classified['其他频道'];
+  // 精简版：主频道 + 原始分组（来源自带、未匹配模版）+ 其他频道；不含地方台
+  const liteClassified = {};
+  const mainNames = new Set((mainChannels || []).map(c => c.name));
+  const localNames = new Set((localChannels || []).map(c => c.name));
+  for (const [cat, items] of Object.entries(classified)) {
+    if (!items || items.length === 0) continue;
+    if (cat === '其他频道' || mainNames.has(cat)) { liteClassified[cat] = items; continue; }
+    if (localNames.has(cat)) continue; // 精简版不含地方台
+    liteClassified[cat] = items; // 原始分组在精简版也展示
+  }
 
    const liteResult = generateClassifiedEntries(liteClassified, mainChannels, [], config, false);
    const txt_lite = renderAsTxt(liteResult.result);

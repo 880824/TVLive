@@ -9,12 +9,10 @@
    logoTemplate: "https://ghfast.top/https://raw.githubusercontent.com/880824/epg/refs/heads/main/logo/{}.png",
    enableLogo: true,
    enableMultiSource: true,
-   singleChannelMaxCount: 5,
-   responseTimeThreshold: 2000,
-   fetchTimeout: 10,
-   userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-   speedtestInterval: 3,
-   removalList: [
+  singleChannelMaxCount: 5,
+  fetchTimeout: 10,
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+  removalList: [
      "「IPV4」","「IPV6」","[ipv6]","[ipv4]","_电信","电信","（HD）","[超清]","高清","超清",
      "-HD","(HK)","AKtv","@","IPV6","🎞️","🎦","[BD]","[VGA]","[HD]","[SD]",
     "(1080p)","(720p)","(480p)","HD","｜","NewTV-","New_",

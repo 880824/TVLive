@@ -8,11 +8,7 @@ import { DEFAULTS, deepClone, DEFAULT_MAIN_CATEGORIES, DEFAULT_LOCAL_CATEGORIES 
 export const KV_KEYS = {
   SETTINGS: 'settings',
   CHANNELS_MAIN: 'channels_main',
-   CHANNELS_LOCAL: 'channels_local',
-  BLACKLIST: 'blacklist',
-  WHITELIST: 'whitelist',
-  SPEEDTEST_STATUS: 'speedtest_status',
-  LIST_META: 'list_meta'
+   CHANNELS_LOCAL: 'channels_local'
  };
  
  
@@ -90,47 +86,6 @@ export async function resetToDefaults(env) {
    await env.TVLIVE.put(KV_KEYS.CHANNELS_LOCAL, JSON.stringify(channels));
  }
  
- // ===================== 黑白名单 =====================
- 
- export async function getBlacklist(env) {
-   try {
-     const data = await env.TVLIVE.get(KV_KEYS.BLACKLIST, { type: 'json' });
-     if (data && Array.isArray(data)) return data;
-   } catch (e) { console.error('KV blacklist error:', e); }
-   return [];
- }
- 
- export async function saveBlacklist(env, list) {
-   await env.TVLIVE.put(KV_KEYS.BLACKLIST, JSON.stringify(list));
- }
- 
- export async function getWhitelist(env) {
-   try {
-     const data = await env.TVLIVE.get(KV_KEYS.WHITELIST, { type: 'json' });
-     if (data && Array.isArray(data)) return data;
-   } catch (e) { console.error('KV whitelist error:', e); }
-   return [];
- }
- 
-export async function saveWhitelist(env, list) {
-  await env.TVLIVE.put(KV_KEYS.WHITELIST, JSON.stringify(list));
-}
-
-// ===================== 黑白名单生成时间 =====================
-/** 读取黑白名单最近一次生成时间 { blacklist, whitelist } */
-export async function getListMeta(env) {
-  try {
-    const data = await env.TVLIVE.get(KV_KEYS.LIST_META, { type: 'json' });
-    if (data && typeof data === 'object') return data;
-  } catch (e) { console.error('KV list meta error:', e); }
-  return {};
-}
-
-/** 保存黑白名单生成时间（仅在自动测速生成时调用） */
-export async function saveListMeta(env, meta) {
-  await env.TVLIVE.put(KV_KEYS.LIST_META, JSON.stringify(meta || {}));
-}
-
 // ===================== 操作日志 =====================
 // 按"天"分键存储，写入时设 7 天 TTL，由 Cloudflare KV 自动过期删除，
 // 无需任何清理代码、也不占用免费计划的 Cron 额度。
@@ -206,21 +161,7 @@ export async function getLogs(env) {
   return all;
 }
 
-// ===================== 测速状态 =====================
- 
- export async function getSpeedtestStatus(env) {
-   try {
-     const data = await env.TVLIVE.get(KV_KEYS.SPEEDTEST_STATUS, { type: 'json' });
-     if (data) return data;
-   } catch (e) { console.error('KV speedtest status error:', e); }
-   return null;
- }
- 
- export async function saveSpeedtestStatus(env, status) {
-   await env.TVLIVE.put(KV_KEYS.SPEEDTEST_STATUS, JSON.stringify(status), { expirationTtl: 86400 });
- }
- 
- /** 构建频道名称→分类的查找 Map */
+/** 构建频道名称→分类的查找 Map */
  export function buildCategoryLookup(mainChannels, localChannels) {
    const lookup = {};
    for (const cat of mainChannels) {
